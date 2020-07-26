@@ -27,18 +27,18 @@ namespace MyTactial.EditorTools
         [Serializable]
         public struct Team
         {
-            public Color color;
-            public Position[] units;
+            public Color Color;
+            public Position[] Units;
         }
 
         public int Rows = 10;
         public int Columns = 10;
 
-        Vector2 scrollPos;
+        Vector2 _scrollPos;
 
         public Team[] Teams = new Team[] {
-            new Team{ color = Color.blue, units = new Position[] { new Position(3, 0), new Position(4, 0), new Position(5, 0), new Position(6, 0) } },
-            new Team{ color = Color.red, units = new Position[] { new Position(3, 9), new Position(4, 9), new Position(5, 9), new Position(6, 9), new Position(4, 8), new Position(5, 8), new Position(4, 7), new Position(5, 7) } }
+            new Team{ Color = Color.blue, Units = new Position[] { new Position(3, 0), new Position(4, 0), new Position(5, 0), new Position(6, 0) } },
+            new Team{ Color = Color.red, Units = new Position[] { new Position(3, 9), new Position(4, 9), new Position(5, 9), new Position(6, 9), new Position(4, 8), new Position(5, 8), new Position(4, 7), new Position(5, 7) } }
         };
 
         [MenuItem("MyTactial/Generate Grid/Generate UI Grid")]
@@ -49,7 +49,7 @@ namespace MyTactial.EditorTools
 
         void OnGUI()
         {
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+            _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
             SerializedObject so = new SerializedObject(this);
             SerializedProperty rows = so.FindProperty("Rows");
@@ -80,7 +80,7 @@ namespace MyTactial.EditorTools
             HashSet<Position> testDuplicastes = new HashSet<Position>();
             foreach (Team team in Teams)
             {
-                foreach (Position unitPos in team.units)
+                foreach (Position unitPos in team.Units)
                 {
                     if (unitPos.x < 0 || unitPos.x >= Columns || unitPos.y < 0 || unitPos.y >= Columns)
                     {
@@ -104,12 +104,13 @@ namespace MyTactial.EditorTools
                 return;
             }
 
-            Battle battle = new Battle(Rows * Columns, Teams.Length);
+            Battle battle = new Battle();
             RectTransform battleGrid = Tools.RectTransformTools.CreateStretched("BattleGrid", (RectTransform)canvas.transform, Vector2.zero, Vector2.one);
             Controller.BattleController battleController = battleGrid.gameObject.AddComponent<Controller.BattleController>();
             battleController.Battle = battle;
 
             UICellView[,] cellViews = new UICellView[Columns, Rows];
+            Cell[] cells = new Cell[Columns * Rows];
 
             float heightPercentage = 1.0f / Rows;
             float widthPercentage = 1.0f / Columns;
@@ -121,7 +122,7 @@ namespace MyTactial.EditorTools
                 for (column = 0, minx = 0; column < Columns; column++, minx += widthPercentage)
                 {
                     Cell cell = new Cell();
-                    battleController.Battle.cells[row * Rows + column] = cell;
+                    cells[row * Rows + column] = cell;
 
                     RectTransform cellTransform = Tools.RectTransformTools.CreateStretched("Cell" + row + column, battleGrid, new Vector2(minx, miny), new Vector2(minx + heightPercentage, miny + widthPercentage));
                     UICellView cellView = cellTransform.gameObject.AddComponent<UICellView>();
@@ -131,17 +132,20 @@ namespace MyTactial.EditorTools
                     cellTransform.gameObject.GetComponent<Image>().color = ((row + column) % 2 == 0) ? Color.white : Color.grey;
                 }
             }
+            battle.Cells = cells;
 
+            Model.Team[] teams = new Model.Team[Teams.Length];
             for (int teamIndex = 0; teamIndex < Teams.Length; teamIndex++)
             {
-                battle.teams[teamIndex] = new Model.Team(Teams[teamIndex].units.Length);
-                for (int positionIndex = 0; positionIndex < Teams[teamIndex].units.Length; positionIndex++)
+                teams[teamIndex] = new Model.Team();
+                Unit[] units = new Unit[Teams[teamIndex].Units.Length];
+                for (int positionIndex = 0; positionIndex < Teams[teamIndex].Units.Length; positionIndex++)
                 {
-                    Position position = Teams[teamIndex].units[positionIndex];
+                    Position position = Teams[teamIndex].Units[positionIndex];
 
-                    Unit unit = new Unit(battle.teams[teamIndex], cellViews[position.x, position.y].Cell);
-                    cellViews[position.x, position.y].Cell.unit = unit;
-                    battle.teams[teamIndex].units[positionIndex] = unit;
+                    Unit unit = new Unit(teams[teamIndex], cellViews[position.x, position.y].Cell);
+                    cellViews[position.x, position.y].Cell.UnitEnter(unit);
+                    units[positionIndex] = unit;
 
                     RectTransform unitTransform = Tools.RectTransformTools.CreateStretched(
                         "T" + teamIndex + "U" + positionIndex,
@@ -152,9 +156,11 @@ namespace MyTactial.EditorTools
                     UIUnitView unitView = unitTransform.gameObject.AddComponent<UIUnitView>();
                     unitView.Unit = unit;
 
-                    unitTransform.gameObject.GetComponent<Image>().color = Teams[teamIndex].color;
+                    unitTransform.gameObject.GetComponent<Image>().color = Teams[teamIndex].Color;
                 }
+                teams[teamIndex].Units = units;
             }
+            battle.Teams = teams;
         }
     }
 }

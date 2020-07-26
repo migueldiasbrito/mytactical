@@ -1,15 +1,14 @@
 ﻿using System;
+using UnityEngine;
 
 namespace MyTactial.Model
 {
-    [Serializable]
-    public class Team
-    {
-        public Unit[] units;
+	[Serializable]
+	public class Team
+	{
+		public Unit[] Units { get { return _units; } set { _units = value; } }
 
-		public Team(int totalUnits)
-		{
-			units = new Unit[totalUnits];
-		}
+		[SerializeField]
+		private Unit[] _units;
 	}
 }

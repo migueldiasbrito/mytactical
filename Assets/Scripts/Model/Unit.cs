@@ -5,15 +5,18 @@ namespace MyTactial.Model
     [Serializable]
     public class Unit
     {
+        public Team Team { get { return _team; } set { _team = value; } }
+        public Cell Cell { get { return _cell; } set { _cell = value; } }
+
         [NonSerialized]
-        public Team team;
+        private Team _team;
         [NonSerialized]
-        public Cell cell;
+        private Cell _cell;
 
         public Unit(Team team, Cell cell)
         {
-            this.team = team;
-            this.cell = cell;
+            _team = team;
+            _cell = cell;
         }
     }
 }
