@@ -6,5 +6,10 @@ namespace MyTactial.Model
     public class Team
     {
         public Unit[] units;
-    }
+
+		public Team(int totalUnits)
+		{
+			units = new Unit[totalUnits];
+		}
+	}
 }
