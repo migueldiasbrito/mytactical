@@ -4,12 +4,7 @@
     {
         public State CurrentState { get; private set; }
 
-        Transition[] _transitions;
-
-        public StateMachine(Transition[] transitions)
-        {
-            _transitions = transitions;
-        }
+        protected Transition[] _transitions;
 
         public bool MakeTransition(int transitionIndex)
         {
