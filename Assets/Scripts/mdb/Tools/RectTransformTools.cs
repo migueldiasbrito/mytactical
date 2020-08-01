@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MyTactial.Tools
+namespace mdb.Tools
 {
     public static class RectTransformTools
     {

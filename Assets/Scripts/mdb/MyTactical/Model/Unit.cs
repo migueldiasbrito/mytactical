@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MyTactial.Model
+namespace mdb.MyTactial.Model
 {
     [Serializable]
     public class Unit

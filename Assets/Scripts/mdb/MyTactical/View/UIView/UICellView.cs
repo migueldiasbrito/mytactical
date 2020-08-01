@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-using MyTactial.Model;
+using mdb.MyTactial.Model;
 
-namespace MyTactial.View.UIView
+namespace mdb.MyTactial.View.UIView
 {
     [RequireComponent(typeof(Image))]
     public class UICellView : MonoBehaviour

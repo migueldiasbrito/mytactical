@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-using MyTactial.Model;
+using mdb.MyTactial.Model;
 
-namespace MyTactial.Controller
+namespace mdb.MyTactial.Controller
 {
     public class BattleController : MonoBehaviour
     {

@@ -4,10 +4,11 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-using MyTactial.Model;
-using MyTactial.View.UIView;
+using mdb.MyTactial.Model;
+using mdb.MyTactial.View.UIView;
+using mdb.Tools;
 
-namespace MyTactial.EditorTools
+namespace mdb.MyTactial.EditorTools
 {
     public class GenerateUIGrid : EditorWindow
     {
@@ -30,6 +31,12 @@ namespace MyTactial.EditorTools
             public Color Color;
             public Position[] Units;
         }
+
+        private const int TotalAdjacentCells = 4;
+        private const int upAdjacentCellIndex = 0;
+        private const int downAdjacentCellIndex = 1;
+        private const int leftAdjacentCellIndex = 2;
+        private const int rightAdjacentCellIndex = 3;
 
         public int Rows = 10;
         public int Columns = 10;
@@ -105,7 +112,7 @@ namespace MyTactial.EditorTools
             }
 
             Battle battle = new Battle();
-            RectTransform battleGrid = Tools.RectTransformTools.CreateStretched("BattleGrid", (RectTransform)canvas.transform, Vector2.zero, Vector2.one);
+            RectTransform battleGrid = RectTransformTools.CreateStretched("BattleGrid", (RectTransform)canvas.transform, Vector2.zero, Vector2.one);
             Controller.BattleController battleController = battleGrid.gameObject.AddComponent<Controller.BattleController>();
             battleController.Battle = battle;
 
@@ -121,10 +128,23 @@ namespace MyTactial.EditorTools
             {
                 for (column = 0, minx = 0; column < Columns; column++, minx += widthPercentage)
                 {
-                    Cell cell = new Cell();
+                    Cell cell = new Cell(TotalAdjacentCells);
+
+                    if (row > 0)
+                    {
+                        cell.AdjacentCells[downAdjacentCellIndex] = cellViews[column, row - 1].Cell;
+                        cellViews[column, row - 1].Cell.AdjacentCells[upAdjacentCellIndex] = cell;
+                    }
+
+                    if (column > 0)
+                    {
+                        cell.AdjacentCells[leftAdjacentCellIndex] = cellViews[column - 1, row].Cell;
+                        cellViews[column - 1, row].Cell.AdjacentCells[rightAdjacentCellIndex] = cell;
+                    }
+
                     cells[row * Rows + column] = cell;
 
-                    RectTransform cellTransform = Tools.RectTransformTools.CreateStretched("Cell" + row + column, battleGrid, new Vector2(minx, miny), new Vector2(minx + heightPercentage, miny + widthPercentage));
+                    RectTransform cellTransform = RectTransformTools.CreateStretched("Cell" + row + column, battleGrid, new Vector2(minx, miny), new Vector2(minx + heightPercentage, miny + widthPercentage));
                     UICellView cellView = cellTransform.gameObject.AddComponent<UICellView>();
                     cellView.Cell = cell;
                     cellViews[column, row] = cellView;
@@ -147,7 +167,7 @@ namespace MyTactial.EditorTools
                     cellViews[position.x, position.y].Cell.UnitEnter(unit);
                     units[positionIndex] = unit;
 
-                    RectTransform unitTransform = Tools.RectTransformTools.CreateStretched(
+                    RectTransform unitTransform = RectTransformTools.CreateStretched(
                         "T" + teamIndex + "U" + positionIndex,
                         (RectTransform)cellViews[position.x, position.y].transform,
                         new Vector2(0.1f, 0.1f),

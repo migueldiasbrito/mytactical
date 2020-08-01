@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MyTactial.Model
+namespace mdb.MyTactial.Model
 {
 	[Serializable]
 	public class Team
