@@ -6,17 +6,19 @@ namespace mdb.MyTactial.Controller
 {
     public class BattleStateMachine : StateMachine.StateMachine
     {
-        public readonly int START_BATTLE;
-        public readonly int BUILD_MAP;
-        public readonly int PLACE_UNITS;
-        public readonly int START_FIRST_TURN;
-        public readonly int START_FIRST_UNIT_TURN;
-        public readonly int MOVE_UNIT;
-        public readonly int END_UNIT_TURN;
-        public readonly int START_NEXT_UNIT_TURN;
-        public readonly int END_TURN;
-        public readonly int START_NEW_TURN;
-        public readonly int END_BATTLE;
+        public static BattleStateMachine instance;
+
+        public int START_BATTLE { get; private set; }
+        public int BUILD_MAP { get; private set; }
+        public int PLACE_UNITS { get; private set; }
+        public int START_FIRST_TURN { get; private set; }
+        public int START_FIRST_UNIT_TURN { get; private set; }
+        public int MOVE_UNIT { get; private set; }
+        public int END_UNIT_TURN { get; private set; }
+        public int START_NEXT_UNIT_TURN { get; private set; }
+        public int END_TURN { get; private set; }
+        public int START_NEW_TURN { get; private set; }
+        public int END_BATTLE { get; private set; }
 
         public readonly State StartBattle = new State();
         public readonly State BuildMap = new State();
@@ -28,8 +30,10 @@ namespace mdb.MyTactial.Controller
         public readonly State EndTurn = new State();
         public readonly State EndBattle = new State();
 
-        public BattleStateMachine()
+        private void Awake()
         {
+            instance = this;
+
             List<Transition> transitions = new List<Transition>();
 
             START_BATTLE = transitions.Count;
@@ -66,6 +70,11 @@ namespace mdb.MyTactial.Controller
             transitions.Add(new Transition(EndTurn, EndBattle));
 
             _transitions = transitions.ToArray();
+        }
+
+        private void OnDestroy()
+        {
+            instance = null;
         }
     }
 }

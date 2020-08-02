@@ -9,8 +9,14 @@ namespace mdb.MyTactial.Model
         public delegate void StateChanged(bool active);
         public event StateChanged StateChangedCallback;
 
+        public delegate void ChangePosition(Cell cell);
+        public event ChangePosition ChangePositionCallback;
+
         public Team Team { get { return _team; } set { _team = value; } }
-        public Cell Cell { get { return _cell; } set { _cell = value; } }
+        public Cell Cell {
+            get { return _cell; } 
+            set { _cell = value; ChangePositionCallback?.Invoke(value); } 
+        }
 
         public int Agility { get { return _agility; } }
         public int Movement { get { return _movement; } }

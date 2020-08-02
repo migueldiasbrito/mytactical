@@ -112,8 +112,10 @@ namespace mdb.MyTactial.EditorTools
             }
 
             RectTransform battleGrid = RectTransformTools.CreateStretched("BattleGrid", (RectTransform)canvas.transform, Vector2.zero, Vector2.one);
-            Controller.BattleController battleController = battleGrid.gameObject.AddComponent<Controller.BattleController>();
+            UIBattleView battleView = battleGrid.gameObject.AddComponent<UIBattleView>();
+            Controller.BattleController battleController = battleGrid.gameObject.GetComponent<Controller.BattleController>();
 
+            battleView.cellViews = new UICellView[Columns * Rows];
             UICellView[,] cellViews = new UICellView[Columns, Rows];
             Cell[] cells = new Cell[Columns * Rows];
             Battle.CellAdjacentsBuilder[] celAdjacentBuilders = new Battle.CellAdjacentsBuilder[Columns * Rows];
@@ -158,9 +160,15 @@ namespace mdb.MyTactial.EditorTools
                     RectTransform cellTransform = RectTransformTools.CreateStretched("Cell" + row + column, battleGrid, new Vector2(minx, miny), new Vector2(minx + heightPercentage, miny + widthPercentage));
                     UICellView cellView = cellTransform.gameObject.AddComponent<UICellView>();
                     cellView.CellIndex = row * Columns + column;
+
+                    battleView.cellViews[row * Columns + column] = cellView;
                     cellViews[column, row] = cellView;
 
                     cellTransform.gameObject.GetComponent<Image>().color = ((row + column) % 2 == 0) ? Color.white : Color.grey;
+
+                    Button button = cellTransform.gameObject.GetComponent<Button>();
+                    button.transition = Selectable.Transition.None;
+                    button.enabled = false;
                 }
             }
 
@@ -181,8 +189,8 @@ namespace mdb.MyTactial.EditorTools
                     RectTransform unitTransform = RectTransformTools.CreateStretched(
                         "T" + teamIndex + "U" + positionIndex,
                         (RectTransform)cellViews[position.x, position.y].transform,
-                        new Vector2(0.1f, 0.1f),
-                        new Vector2(0.9f, 0.9f));
+                        new Vector2(0.2f, 0.2f),
+                        new Vector2(0.8f, 0.8f));
 
                     UIUnitView unitView = unitTransform.gameObject.AddComponent<UIUnitView>();
                     unitView.TeamIndex = teamIndex;

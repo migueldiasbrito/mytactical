@@ -89,11 +89,7 @@ namespace mdb.MyTactial.Model
                     Unit unit = _teams[teamIndex].Units[unitIndex];
                     Cell cell = _cells[_initialPositions[positionIndex]];
 
-                    if (cell.UnitEnter(unit))
-                    {
-                        unit.Cell = cell;
-                    }
-                    else
+                    if (!cell.UnitEnter(unit))
                     {
                         Debug.LogWarning("Multiple units on the same cell");
                     }

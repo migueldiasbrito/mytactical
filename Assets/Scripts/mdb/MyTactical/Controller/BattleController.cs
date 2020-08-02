@@ -5,17 +5,15 @@ using mdb.MyTactial.Model;
 
 namespace mdb.MyTactial.Controller
 {
+    [RequireComponent(typeof(BattleStateMachine))]
     public class BattleController : MonoBehaviour
     {
         public static BattleController instance;
 
         public Battle Battle { get { return _battle; } set { _battle = value; } }
 
-        [SerializeField]
+		[SerializeField]
         private Battle _battle;
-
-        private BattleStateMachine _stateMachine;
-
         private Queue<Unit> _turnUnitsOrder;
         private Unit _currentUnit;
         private Cell[] _currentUnitReachableCells;
@@ -27,7 +25,9 @@ namespace mdb.MyTactial.Controller
 
         private void Start()
         {
-            BuildStateMachine();
+            AddStateMachineListeners();
+
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_BATTLE);
         }
 
         private void OnDestroy()
@@ -35,34 +35,35 @@ namespace mdb.MyTactial.Controller
             instance = null;
         }
 
-        private void BuildStateMachine()
+        private void AddStateMachineListeners()
         {
-            _stateMachine = new BattleStateMachine();
-            _stateMachine.StartBattle.OnEnter += OnStartBattle;
-            _stateMachine.BuildMap.OnEnter += OnBuildMap;
-            _stateMachine.PlaceUnits.OnEnter += OnPlaceUnits;
-            _stateMachine.StartTurn.OnEnter += OnStartTurn;
-            _stateMachine.StartUnitTurn.OnEnter += OnStartUnitTurn;
+            BattleStateMachine.instance.StartBattle.OnEnter += OnStartBattle;
+            BattleStateMachine.instance.BuildMap.OnEnter += OnBuildMap;
+            BattleStateMachine.instance.PlaceUnits.OnEnter += OnPlaceUnits;
+            BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
+            BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
+            BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
+            BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
 
-            _stateMachine.MakeTransition(_stateMachine.START_BATTLE);
+            BattleStateMachine.instance.MoveUnit.OnClickEvent += OnMoveUnitClick;
         }
 
         private void OnStartBattle()
         {
-            _stateMachine.MakeTransition(_stateMachine.BUILD_MAP);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.BUILD_MAP);
         }
 
         private void OnBuildMap()
         {
             _battle.BuildAdjacents();
-            _stateMachine.MakeTransition(_stateMachine.PLACE_UNITS);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.PLACE_UNITS);
         }
 
         private void OnPlaceUnits()
         {
             _battle.SetUnits();
             _battle.PlaceUnits();
-            _stateMachine.MakeTransition(_stateMachine.START_FIRST_TURN);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_FIRST_TURN);
         }
 
         private void OnStartTurn()
@@ -78,7 +79,7 @@ namespace mdb.MyTactial.Controller
 
             _turnUnitsOrder = new Queue<Unit>(units);
 
-            _stateMachine.MakeTransition(_stateMachine.START_FIRST_UNIT_TURN);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_FIRST_UNIT_TURN);
         }
 
         private void OnStartUnitTurn()
@@ -88,7 +89,47 @@ namespace mdb.MyTactial.Controller
 
             GetUnitPossibleReachableCells();
 
-            _stateMachine.MakeTransition(_stateMachine.MOVE_UNIT);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.MOVE_UNIT);
+        }
+
+        private void OnMoveUnitClick(object obj)
+        {
+            if (obj is Cell cell)
+            {
+                if (cell == _currentUnit.Cell)
+                {
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_TURN);
+                }
+
+                if (cell.IsActive() && cell.UnitEnter(_currentUnit))
+                {
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_TURN);
+                }
+            }
+        }
+
+        private void OnEndUnitTurn()
+        {
+            foreach (Cell cell in _currentUnitReachableCells)
+            {
+                cell.SetActive(false);
+            }
+
+            _currentUnit.SetActive(false);
+
+            if (_turnUnitsOrder.Count > 0)
+            {
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_NEXT_UNIT_TURN);
+            }
+            else
+            {
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_TURN);
+            }
+        }
+
+        private void OnEndTurn()
+        {
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_NEW_TURN);
         }
 
         private int TurnOrderSort(Unit u1, Unit u2)

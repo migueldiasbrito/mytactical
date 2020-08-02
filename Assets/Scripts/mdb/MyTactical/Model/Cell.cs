@@ -22,7 +22,14 @@ namespace mdb.MyTactial.Model
         {
             if (_unit != null) { return false; }
 
+            if(unit.Cell != null)
+            {
+                unit.Cell.UnitExit();
+            }
+
             _unit = unit;
+            unit.Cell = this;
+
             return true;
         }
 
