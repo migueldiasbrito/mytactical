@@ -111,13 +111,12 @@ namespace mdb.MyTactial.EditorTools
                 return;
             }
 
-            Battle battle = new Battle();
             RectTransform battleGrid = RectTransformTools.CreateStretched("BattleGrid", (RectTransform)canvas.transform, Vector2.zero, Vector2.one);
             Controller.BattleController battleController = battleGrid.gameObject.AddComponent<Controller.BattleController>();
-            battleController.Battle = battle;
 
             UICellView[,] cellViews = new UICellView[Columns, Rows];
             Cell[] cells = new Cell[Columns * Rows];
+            Battle.CellAdjacentsBuilder[] celAdjacentBuilders = new Battle.CellAdjacentsBuilder[Columns * Rows];
 
             float heightPercentage = 1.0f / Rows;
             float widthPercentage = 1.0f / Columns;
@@ -128,33 +127,45 @@ namespace mdb.MyTactial.EditorTools
             {
                 for (column = 0, minx = 0; column < Columns; column++, minx += widthPercentage)
                 {
-                    Cell cell = new Cell(TotalAdjacentCells);
+                    Cell cell = new Cell();
 
-                    if (row > 0)
+                    List<int> adjacentCells = new List<int>();
+
+                    if (row > 0 && Rows > 1)
                     {
-                        cell.AdjacentCells[downAdjacentCellIndex] = cellViews[column, row - 1].Cell;
-                        cellViews[column, row - 1].Cell.AdjacentCells[upAdjacentCellIndex] = cell;
+                        adjacentCells.Add((row - 1) * Columns + column);
                     }
 
-                    if (column > 0)
+                    if (row < Rows - 1 && Rows > 1)
                     {
-                        cell.AdjacentCells[leftAdjacentCellIndex] = cellViews[column - 1, row].Cell;
-                        cellViews[column - 1, row].Cell.AdjacentCells[rightAdjacentCellIndex] = cell;
+                        adjacentCells.Add((row + 1) * Columns + column);
                     }
 
-                    cells[row * Rows + column] = cell;
+                    if (column > 0 && Columns > 1)
+                    {
+                        adjacentCells.Add(row * Columns + column - 1);
+                    }
+
+                    if (column < Columns - 1 && Columns > 1)
+                    {
+                        adjacentCells.Add(row * Columns + column + 1);
+                    }
+
+                    celAdjacentBuilders[row * Rows + column] = new Battle.CellAdjacentsBuilder { AdjacentCells = adjacentCells.ToArray() };
+
+                    cells[row * Columns + column] = cell;
 
                     RectTransform cellTransform = RectTransformTools.CreateStretched("Cell" + row + column, battleGrid, new Vector2(minx, miny), new Vector2(minx + heightPercentage, miny + widthPercentage));
                     UICellView cellView = cellTransform.gameObject.AddComponent<UICellView>();
-                    cellView.Cell = cell;
+                    cellView.CellIndex = row * Columns + column;
                     cellViews[column, row] = cellView;
 
                     cellTransform.gameObject.GetComponent<Image>().color = ((row + column) % 2 == 0) ? Color.white : Color.grey;
                 }
             }
-            battle.Cells = cells;
 
             Model.Team[] teams = new Model.Team[Teams.Length];
+            List<int> initialPositions = new List<int>();
             for (int teamIndex = 0; teamIndex < Teams.Length; teamIndex++)
             {
                 teams[teamIndex] = new Model.Team();
@@ -163,9 +174,9 @@ namespace mdb.MyTactial.EditorTools
                 {
                     Position position = Teams[teamIndex].Units[positionIndex];
 
-                    Unit unit = new Unit(teams[teamIndex], cellViews[position.x, position.y].Cell);
-                    cellViews[position.x, position.y].Cell.UnitEnter(unit);
+                    Unit unit = new Unit();
                     units[positionIndex] = unit;
+                    initialPositions.Add(position.x + position.y * Columns);
 
                     RectTransform unitTransform = RectTransformTools.CreateStretched(
                         "T" + teamIndex + "U" + positionIndex,
@@ -174,13 +185,16 @@ namespace mdb.MyTactial.EditorTools
                         new Vector2(0.9f, 0.9f));
 
                     UIUnitView unitView = unitTransform.gameObject.AddComponent<UIUnitView>();
-                    unitView.Unit = unit;
+                    unitView.TeamIndex = teamIndex;
+                    unitView.UnitIndex = positionIndex;
 
                     unitTransform.gameObject.GetComponent<Image>().color = Teams[teamIndex].Color;
                 }
                 teams[teamIndex].Units = units;
             }
-            battle.Teams = teams;
+
+            Battle battle = new Battle(cells, celAdjacentBuilders, teams, initialPositions.ToArray());
+            battleController.Battle = battle;
         }
     }
 }
