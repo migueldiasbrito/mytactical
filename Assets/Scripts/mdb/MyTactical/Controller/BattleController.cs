@@ -17,6 +17,7 @@ namespace mdb.MyTactial.Controller
         private Queue<Unit> _turnUnitsOrder;
         private Unit _currentUnit;
         private Cell[] _currentUnitReachableCells;
+        private Unit[] _currentTargetUnits;
 
         private void Awake()
         {
@@ -42,6 +43,7 @@ namespace mdb.MyTactial.Controller
             BattleStateMachine.instance.PlaceUnits.OnEnter += OnPlaceUnits;
             BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
             BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
+            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
             BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
 
@@ -98,24 +100,34 @@ namespace mdb.MyTactial.Controller
             {
                 if (cell == _currentUnit.Cell)
                 {
-                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_TURN);
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ACTIONS_MENU);
                 }
 
                 if (cell.IsActive() && cell.UnitEnter(_currentUnit))
                 {
-                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_TURN);
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ACTIONS_MENU);
                 }
             }
         }
 
-        private void OnEndUnitTurn()
+        private void OnActionsMenu()
         {
             foreach (Cell cell in _currentUnitReachableCells)
             {
                 cell.SetActive(false);
             }
 
+            GetUnitPossibleTargets();
+        }
+
+        private void OnEndUnitTurn()
+        {
             _currentUnit.SetActive(false);
+
+            foreach (Unit unit in _currentTargetUnits)
+            {
+                unit.SetActive(false);
+            }
 
             if (_turnUnitsOrder.Count > 0)
             {
@@ -180,6 +192,22 @@ namespace mdb.MyTactial.Controller
             }
 
             _currentUnitReachableCells = cells.ToArray();
+        }
+
+        private void GetUnitPossibleTargets()
+        {
+            List<Unit> targets = new List<Unit>();
+            for (int cellIndex = 0; cellIndex < _currentUnit.Cell.AdjacentCells.Length; cellIndex++)
+            {
+                Cell cell = _currentUnit.Cell.AdjacentCells[cellIndex];
+
+                if(cell.Unit != null && cell.Unit.Team != _currentUnit.Team)
+                {
+                    targets.Add(cell.Unit);
+                    cell.Unit.SetActive(true);
+                }
+            }
+            _currentTargetUnits = targets.ToArray();
         }
     }
 }
