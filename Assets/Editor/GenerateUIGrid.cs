@@ -30,6 +30,7 @@ namespace mdb.MyTactial.EditorTools
         [Serializable]
         public struct Team
         {
+            public string Name;
             public Color Color;
             public UnitBuilder[] Units;
         }
@@ -41,6 +42,7 @@ namespace mdb.MyTactial.EditorTools
 
         public Team[] Teams = new Team[] {
             new Team{
+                Name = "Blue",
                 Color = Color.blue,
                 Units = new UnitBuilder[] {
                     new UnitBuilder("Blue Unit", 3, 0),
@@ -50,6 +52,7 @@ namespace mdb.MyTactial.EditorTools
                 }
             },
             new Team{
+                Name = "Red",
                 Color = Color.red,
                 Units = new UnitBuilder[] {
                     new UnitBuilder("Red Unit", 3, 9),
@@ -192,7 +195,7 @@ namespace mdb.MyTactial.EditorTools
             List<int> initialPositions = new List<int>();
             for (int teamIndex = 0; teamIndex < Teams.Length; teamIndex++)
             {
-                teams[teamIndex] = new Model.Team();
+                teams[teamIndex] = new Model.Team(Teams[teamIndex].Name);
                 Unit[] units = new Unit[Teams[teamIndex].Units.Length];
                 for (int unitIndex = 0; unitIndex < Teams[teamIndex].Units.Length; unitIndex++)
                 {

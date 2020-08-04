@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 using mdb.MyTactial.Controller;
 using mdb.MyTactial.Model;
+using UnityEngine.SceneManagement;
 
 namespace mdb.MyTactial.View.UIView
 {
@@ -47,6 +48,9 @@ namespace mdb.MyTactial.View.UIView
             BattleStateMachine.instance.ActionsMenu.OnExit += OnActionsMenuExit;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
+            BattleStateMachine.instance.EndBattle.OnEnter += OnEndBattle;
+
+            BattleStateMachine.instance.EndBattle.OnClickEvent += OnEndBattleClick;
 
             AttackButton.onClick.AddListener(Attack);
             NoActionButton.onClick.AddListener(NoAction);
@@ -84,26 +88,24 @@ namespace mdb.MyTactial.View.UIView
         private void OnAttack()
         {
             _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks " + BattleController.instance.CurrentTarget.Name);
-
-            /*if(BattleController.instance.CurrentTarget.GetState() == Unit.State.Dead)
-            {
-                _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
-            }*/
-
-            MessageText.text = _messages.Dequeue();
-            MessageText.gameObject.SetActive(true);
-
-            MessageButton.gameObject.SetActive(true);
+            NextMessage();
         }
 
         private void OnUnitDefeated()
         {
             _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
+            NextMessage();
+        }
 
-            MessageText.text = _messages.Dequeue();
-            MessageText.gameObject.SetActive(true);
+        private void OnEndBattle()
+        {
+            _messages.Enqueue(BattleController.instance.CurrentUnit.Team.Name + " won");
+            NextMessage();
+        }
 
-            MessageButton.gameObject.SetActive(true);
+        private void OnEndBattleClick(object obj)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void Attack()
@@ -121,6 +123,9 @@ namespace mdb.MyTactial.View.UIView
             if (_messages.Count > 0)
             {
                 MessageText.text = _messages.Dequeue();
+                MessageText.gameObject.SetActive(true);
+
+                MessageButton.gameObject.SetActive(true);
             }
             else
             {

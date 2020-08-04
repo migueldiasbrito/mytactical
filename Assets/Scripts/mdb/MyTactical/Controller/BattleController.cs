@@ -186,9 +186,17 @@ namespace mdb.MyTactial.Controller
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.UNIT_DEFEATED);
             }
         }
+
         private void OnUnitDefeatedClick(object obj)
         {
-            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_DEFEATED);
+            if (CurrentTarget.Team.HasLiveUnits())
+            {
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_DEFEATED);
+            }
+            else
+            {
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_BATTLE);
+            }
         }
 
         private void OnEndUnitTurn()

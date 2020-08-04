@@ -85,6 +85,9 @@ namespace mdb.MyTactial.Controller
             END_UNIT_DEFEATED = transitions.Count;
             transitions.Add(new Transition(UnitDefeated, EndUnitTurn));
 
+            END_BATTLE = transitions.Count;
+            transitions.Add(new Transition(UnitDefeated, EndBattle));
+
             START_NEXT_UNIT_TURN = transitions.Count;
             transitions.Add(new Transition(EndUnitTurn, StartUnitTurn));
 
@@ -93,9 +96,6 @@ namespace mdb.MyTactial.Controller
 
             START_NEW_TURN = transitions.Count;
             transitions.Add(new Transition(EndTurn, StartTurn));
-
-            END_BATTLE = transitions.Count;
-            transitions.Add(new Transition(EndTurn, EndBattle));
 
             _transitions = transitions.ToArray();
         }
