@@ -13,13 +13,15 @@ namespace mdb.MyTactial.EditorTools
     public class GenerateUIGrid : EditorWindow
     {
         [Serializable]
-        public struct Position
+        public struct UnitBuilder
         {
+            public string name;
             public int x;
             public int y;
 
-            public Position(int x, int y)
+            public UnitBuilder(string name, int x, int y)
             {
+                this.name = name;
                 this.x = x;
                 this.y = y;
             }
@@ -29,14 +31,8 @@ namespace mdb.MyTactial.EditorTools
         public struct Team
         {
             public Color Color;
-            public Position[] Units;
+            public UnitBuilder[] Units;
         }
-
-        private const int TotalAdjacentCells = 4;
-        private const int upAdjacentCellIndex = 0;
-        private const int downAdjacentCellIndex = 1;
-        private const int leftAdjacentCellIndex = 2;
-        private const int rightAdjacentCellIndex = 3;
 
         public int Rows = 10;
         public int Columns = 10;
@@ -44,8 +40,28 @@ namespace mdb.MyTactial.EditorTools
         Vector2 _scrollPos;
 
         public Team[] Teams = new Team[] {
-            new Team{ Color = Color.blue, Units = new Position[] { new Position(3, 0), new Position(4, 0), new Position(5, 0), new Position(6, 0) } },
-            new Team{ Color = Color.red, Units = new Position[] { new Position(3, 9), new Position(4, 9), new Position(5, 9), new Position(6, 9), new Position(4, 8), new Position(5, 8), new Position(4, 7), new Position(5, 7) } }
+            new Team{
+                Color = Color.blue,
+                Units = new UnitBuilder[] {
+                    new UnitBuilder("Blue Unit", 3, 0),
+                    new UnitBuilder("Blue Unit", 4, 0),
+                    new UnitBuilder("Blue Unit", 5, 0),
+                    new UnitBuilder("Blue Unit", 6, 0)
+                }
+            },
+            new Team{
+                Color = Color.red,
+                Units = new UnitBuilder[] {
+                    new UnitBuilder("Red Unit", 3, 9),
+                    new UnitBuilder("Red Unit", 4, 9),
+                    new UnitBuilder("Red Unit", 5, 9),
+                    new UnitBuilder("Red Unit", 6, 9),
+                    new UnitBuilder("Red Unit", 4, 8),
+                    new UnitBuilder("Red Unit", 5, 8),
+                    new UnitBuilder("Red Unit", 4, 7),
+                    new UnitBuilder("Red Unit", 5, 7)
+                }
+            }
         };
 
         [MenuItem("MyTactial/Generate Grid/Generate UI Grid")]
@@ -84,10 +100,10 @@ namespace mdb.MyTactial.EditorTools
                 return;
             }
 
-            HashSet<Position> testDuplicastes = new HashSet<Position>();
+            HashSet<UnitBuilder> testDuplicastes = new HashSet<UnitBuilder>();
             foreach (Team team in Teams)
             {
-                foreach (Position unitPos in team.Units)
+                foreach (UnitBuilder unitPos in team.Units)
                 {
                     if (unitPos.x < 0 || unitPos.x >= Columns || unitPos.y < 0 || unitPos.y >= Columns)
                     {
@@ -178,23 +194,23 @@ namespace mdb.MyTactial.EditorTools
             {
                 teams[teamIndex] = new Model.Team();
                 Unit[] units = new Unit[Teams[teamIndex].Units.Length];
-                for (int positionIndex = 0; positionIndex < Teams[teamIndex].Units.Length; positionIndex++)
+                for (int unitIndex = 0; unitIndex < Teams[teamIndex].Units.Length; unitIndex++)
                 {
-                    Position position = Teams[teamIndex].Units[positionIndex];
+                    UnitBuilder unitBuilder = Teams[teamIndex].Units[unitIndex];
 
-                    Unit unit = new Unit();
-                    units[positionIndex] = unit;
-                    initialPositions.Add(position.x + position.y * Columns);
+                    Unit unit = new Unit(unitBuilder.name);
+                    units[unitIndex] = unit;
+                    initialPositions.Add(unitBuilder.x + unitBuilder.y * Columns);
 
                     RectTransform unitTransform = RectTransformTools.CreateStretched(
-                        "T" + teamIndex + "U" + positionIndex,
-                        (RectTransform)cellViews[position.x, position.y].transform,
+                        "T" + teamIndex + "U" + unitIndex,
+                        (RectTransform)cellViews[unitBuilder.x, unitBuilder.y].transform,
                         new Vector2(0.2f, 0.2f),
                         new Vector2(0.8f, 0.8f));
 
                     UIUnitView unitView = unitTransform.gameObject.AddComponent<UIUnitView>();
                     unitView.TeamIndex = teamIndex;
-                    unitView.UnitIndex = positionIndex;
+                    unitView.UnitIndex = unitIndex;
 
                     unitTransform.gameObject.GetComponent<Image>().color = Teams[teamIndex].Color;
                 }
@@ -212,8 +228,10 @@ namespace mdb.MyTactial.EditorTools
 
             actionsMenu.gameObject.SetActive(false);
 
-            battleView.TextMessage = CreateButtonHelper("ATTACK", (RectTransform)canvas.transform, new Vector2(0.1f, 0.01f), new Vector2(0.9f, 0.09f));
-            battleView.TextMessage.gameObject.SetActive(false);
+            battleView.MessageButton = CreateButtonHelper("MessageBox", (RectTransform)canvas.transform, new Vector2(0.1f, 0.01f), new Vector2(0.9f, 0.14f));
+            battleView.MessageButton.gameObject.SetActive(false);
+            battleView.MessageText = battleView.MessageButton.GetComponentInChildren<Text>();
+            battleView.MessageText.gameObject.SetActive(false);
         }
 
         private Button CreateButtonHelper(string text, RectTransform parent, Vector2 minAnchor, Vector2 maxAnchor)

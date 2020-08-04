@@ -20,9 +20,12 @@ namespace mdb.MyTactial.Model
             set { _cell = value; ChangePositionCallback?.Invoke(value); } 
         }
 
+        public string Name { get { return _name; } }
         public int Agility { get { return _agility; } }
         public int Movement { get { return _movement; } }
 
+        [SerializeField]
+        private string _name;
         [SerializeField]
         private int _healthPoints = 1;
         [SerializeField]
@@ -43,6 +46,11 @@ namespace mdb.MyTactial.Model
 
         private State _state;
 
+        public Unit(string name)
+        {
+            _name = name;
+        }
+
         public void Init()
         {
             _currentHealthPoints = _healthPoints;
@@ -50,9 +58,9 @@ namespace mdb.MyTactial.Model
 
         public void GetAttackedBy(Unit unit)
         {
-            _healthPoints -= Math.Max(unit._attack - _defense, 1);
+            _currentHealthPoints -= Math.Max(unit._attack - _defense, 1);
 
-            if (_healthPoints <= 0)
+            if (_currentHealthPoints <= 0)
             {
                 Cell.UnitExit();
                 SetActive(State.Dead);

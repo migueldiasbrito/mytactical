@@ -17,9 +17,12 @@ namespace mdb.MyTactial.View.UIView
         public Button AttackButton;
         public Button NoActionButton;
 
-        public Button TextMessage;
+        public Button MessageButton;
+        public Text MessageText;
 
         private Dictionary<Cell, UICellView> _cellMap;
+
+        private Queue<string> _messages = new Queue<string>();
 
         public Transform GetCellView(Cell cell)
         {
@@ -47,7 +50,7 @@ namespace mdb.MyTactial.View.UIView
             AttackButton.onClick.AddListener(Attack);
             NoActionButton.onClick.AddListener(NoAction);
 
-            TextMessage.onClick.AddListener(CloseAttackMessage);
+            MessageButton.onClick.AddListener(NextMessage);
         }
 
         private void OnDestroy()
@@ -79,7 +82,17 @@ namespace mdb.MyTactial.View.UIView
 
         private void OnAttack()
         {
-            TextMessage.gameObject.SetActive(true);
+            _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks " + BattleController.instance.CurrentTarget.Name);
+
+            if(BattleController.instance.CurrentTarget.GetState() == Unit.State.Dead)
+            {
+                _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
+            }
+
+            MessageText.text = _messages.Dequeue();
+            MessageText.gameObject.SetActive(true);
+
+            MessageButton.gameObject.SetActive(true);
         }
 
         private void Attack()
@@ -92,10 +105,18 @@ namespace mdb.MyTactial.View.UIView
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
         }
 
-        private void CloseAttackMessage()
+        private void NextMessage()
         {
-            TextMessage.gameObject.SetActive(false);
-            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_ATTACK);
+            if (_messages.Count > 0)
+            {
+                MessageText.text = _messages.Dequeue();
+            }
+            else
+            {
+                MessageText.gameObject.SetActive(false);
+                MessageButton.gameObject.SetActive(false);
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_ATTACK);
+            }
         }
     }
 }
