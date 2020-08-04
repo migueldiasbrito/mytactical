@@ -8,6 +8,7 @@ using mdb.Tools;
 namespace mdb.MyTactial.View.UIView
 {
     [RequireComponent(typeof(Image))]
+    [RequireComponent(typeof(Button))]
     public class UIUnitView : MonoBehaviour
     {
         public int TeamIndex;
@@ -18,6 +19,8 @@ namespace mdb.MyTactial.View.UIView
         private Image _image;
         private Color _defaultColor;
 
+        private Button _button;
+
         private void Start()
         {
             _unit = BattleController.instance.Battle.Teams[TeamIndex].Units[UnitIndex];
@@ -26,12 +29,36 @@ namespace mdb.MyTactial.View.UIView
             _image = GetComponent<Image>();
             _defaultColor = _image.color;
 
+            _button = GetComponent<Button>();
+            _button.onClick.AddListener(OnClick);
+
             BattleStateMachine.instance.PlaceUnits.OnExit += OnPlaceUnitExit;
         }
 
-        private void UnitStateChanged(bool active)
+        private void UnitStateChanged(Unit.State state)
         {
-            _image.color = active ? Color.green : _defaultColor;
+            switch (state)
+            {
+                case Unit.State.Idle:
+                    _image.color = _defaultColor;
+                    _button.enabled = false;
+                    break;
+                case Unit.State.Active:
+                    _image.color = Color.green;
+                    _button.enabled = false;
+                    break;
+                case Unit.State.Target:
+                    if (_defaultColor == Color.red)
+                    {
+                        _image.color = Color.magenta;
+                    }
+                    else if (_defaultColor == Color.blue)
+                    {
+                        _image.color = Color.cyan;
+                    }
+                    _button.enabled = true;
+                    break;
+            }
         }
 
         private void OnPlaceUnitExit()
@@ -47,6 +74,14 @@ namespace mdb.MyTactial.View.UIView
             RectTransformTools.SetLeft((RectTransform)transform, 0);
             RectTransformTools.SetBottom((RectTransform)transform, 0);
             RectTransformTools.SetRight((RectTransform)transform, 0);
+        }
+
+        private void OnClick()
+        {
+            if (_unit.GetState() == Unit.State.Target)
+            {
+                BattleStateMachine.instance.OnClick(_unit);
+            }
         }
     }
 }

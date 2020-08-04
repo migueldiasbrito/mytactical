@@ -6,7 +6,9 @@ namespace mdb.MyTactial.Model
     [Serializable]
     public class Unit
     {
-        public delegate void StateChanged(bool active);
+        public enum State { Idle, Active, Target }
+
+        public delegate void StateChanged(State state);
         public event StateChanged StateChangedCallback;
 
         public delegate void ChangePosition(Cell cell);
@@ -31,17 +33,17 @@ namespace mdb.MyTactial.Model
         [NonSerialized]
         private Cell _cell;
 
-        private bool _active;
+        private State _state;
 
-        public void SetActive(bool active)
+        public void SetActive(State state)
         {
-            _active = active;
-            StateChangedCallback?.Invoke(_active);
+            _state = state;
+            StateChangedCallback?.Invoke(_state);
         }
 
-        public bool IsActive()
+        public State GetState()
         {
-            return _active;
+            return _state;
         }
     }
 }

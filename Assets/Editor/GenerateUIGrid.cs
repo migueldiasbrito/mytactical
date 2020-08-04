@@ -207,18 +207,28 @@ namespace mdb.MyTactial.EditorTools
             RectTransform actionsMenu = RectTransformTools.CreateStretched("MenuActions", (RectTransform)canvas.transform, Vector2.zero, new Vector2(1, 0.1f));
             battleView.ActionsMenu = actionsMenu.gameObject;
 
-            RectTransform noActionObject = RectTransformTools.CreateStretched("NoAction", actionsMenu, new Vector2(0.55f, 0.1f), new Vector2(0.85f, 0.9f));
-            Button noActionButton = noActionObject.gameObject.AddComponent<Button>();
-            battleView.NoActionButton = noActionButton;
-            Image noActionImage = noActionObject.gameObject.AddComponent<Image>();
-            noActionImage.color = new Color(0.75f, 0.75f, 0.75f, 0.85f);
-            noActionButton.image = noActionImage;
-            RectTransform noActionTextObject = RectTransformTools.CreateStretched("Text", noActionObject, Vector2.zero, Vector2.one);
-            Text noActionText = noActionTextObject.gameObject.AddComponent<Text>();
-            noActionText.text = "NO ACTION";
-            noActionText.color = Color.black;
+            battleView.AttackButton = CreateButtonHelper("ATTACK", actionsMenu, new Vector2(0.15f, 0.1f), new Vector2(0.45f, 0.9f));
+            battleView.NoActionButton = CreateButtonHelper("NO ACTION", actionsMenu, new Vector2(0.55f, 0.1f), new Vector2(0.85f, 0.9f));
 
             actionsMenu.gameObject.SetActive(false);
+        }
+
+        private Button CreateButtonHelper(string text, RectTransform parent, Vector2 minAnchor, Vector2 maxAnchor)
+        {
+            RectTransform gameObject = RectTransformTools.CreateStretched(text, parent, minAnchor, maxAnchor);
+            Button button = gameObject.gameObject.AddComponent<Button>();
+            
+            Image image = gameObject.gameObject.AddComponent<Image>();
+            image.color = new Color(0.75f, 0.75f, 0.75f, 0.85f);
+            button.image = image;
+
+            RectTransform textGameObject = RectTransformTools.CreateStretched("Text", gameObject, Vector2.zero, Vector2.one);
+            Text buttonText = textGameObject.gameObject.AddComponent<Text>();
+            buttonText.text = text;
+            buttonText.color = Color.black;
+            buttonText.alignment = TextAnchor.MiddleCenter;
+
+            return button;
         }
     }
 }

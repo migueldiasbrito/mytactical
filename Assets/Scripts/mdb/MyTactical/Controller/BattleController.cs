@@ -12,12 +12,17 @@ namespace mdb.MyTactial.Controller
 
         public Battle Battle { get { return _battle; } set { _battle = value; } }
 
-		[SerializeField]
+        [SerializeField]
         private Battle _battle;
         private Queue<Unit> _turnUnitsOrder;
         private Unit _currentUnit;
         private Cell[] _currentUnitReachableCells;
-        private Unit[] _currentTargetUnits;
+        private Unit[] _currentTargetUnits = new Unit[0];
+
+        public bool HasTargets()
+        {
+            return _currentTargetUnits.Length > 0;
+        }
 
         private void Awake()
         {
@@ -43,11 +48,14 @@ namespace mdb.MyTactial.Controller
             BattleStateMachine.instance.PlaceUnits.OnEnter += OnPlaceUnits;
             BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
             BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
-            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
+            BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
             BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
 
+            BattleStateMachine.instance.MoveUnit.OnExit += OnMoveUnitExit;
+
             BattleStateMachine.instance.MoveUnit.OnClickEvent += OnMoveUnitClick;
+            BattleStateMachine.instance.SelectTarget.OnClickEvent += OnSelectTargetClick;
         }
 
         private void OnStartBattle()
@@ -87,7 +95,7 @@ namespace mdb.MyTactial.Controller
         private void OnStartUnitTurn()
         {
             _currentUnit = _turnUnitsOrder.Dequeue();
-            _currentUnit.SetActive(true);
+            _currentUnit.SetActive(Unit.State.Active);
 
             GetUnitPossibleReachableCells();
 
@@ -110,7 +118,7 @@ namespace mdb.MyTactial.Controller
             }
         }
 
-        private void OnActionsMenu()
+        private void OnMoveUnitExit()
         {
             foreach (Cell cell in _currentUnitReachableCells)
             {
@@ -120,14 +128,32 @@ namespace mdb.MyTactial.Controller
             GetUnitPossibleTargets();
         }
 
+        private void OnSelectTargetClick(object obj)
+        {
+            if (obj is Unit unit)
+            {
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
+            }
+        }
+
+        private void OnSelectTarget()
+        {
+            foreach (Unit unit in _currentTargetUnits)
+            {
+                unit.SetActive(Unit.State.Target);
+            }
+        }
+
         private void OnEndUnitTurn()
         {
-            _currentUnit.SetActive(false);
+            _currentUnit.SetActive(Unit.State.Idle);
 
             foreach (Unit unit in _currentTargetUnits)
             {
-                unit.SetActive(false);
+                unit.SetActive(Unit.State.Idle);
             }
+
+            _currentTargetUnits = new Unit[0];
 
             if (_turnUnitsOrder.Count > 0)
             {
@@ -204,7 +230,6 @@ namespace mdb.MyTactial.Controller
                 if(cell.Unit != null && cell.Unit.Team != _currentUnit.Team)
                 {
                     targets.Add(cell.Unit);
-                    cell.Unit.SetActive(true);
                 }
             }
             _currentTargetUnits = targets.ToArray();
