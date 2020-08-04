@@ -17,6 +17,8 @@ namespace mdb.MyTactial.View.UIView
         public Button AttackButton;
         public Button NoActionButton;
 
+        public Button TextMessage;
+
         private Dictionary<Cell, UICellView> _cellMap;
 
         public Transform GetCellView(Cell cell)
@@ -40,9 +42,12 @@ namespace mdb.MyTactial.View.UIView
 
             BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
             BattleStateMachine.instance.ActionsMenu.OnExit += OnActionsMenuExit;
+            BattleStateMachine.instance.Attack.OnEnter += OnAttack;
 
             AttackButton.onClick.AddListener(Attack);
             NoActionButton.onClick.AddListener(NoAction);
+
+            TextMessage.onClick.AddListener(CloseAttackMessage);
         }
 
         private void OnDestroy()
@@ -72,6 +77,10 @@ namespace mdb.MyTactial.View.UIView
             ActionsMenu.SetActive(false);
         }
 
+        private void OnAttack()
+        {
+            TextMessage.gameObject.SetActive(true);
+        }
 
         private void Attack()
         {
@@ -81,6 +90,12 @@ namespace mdb.MyTactial.View.UIView
         private void NoAction()
         {
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
+        }
+
+        private void CloseAttackMessage()
+        {
+            TextMessage.gameObject.SetActive(false);
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_ATTACK);
         }
     }
 }

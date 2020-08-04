@@ -211,6 +211,9 @@ namespace mdb.MyTactial.EditorTools
             battleView.NoActionButton = CreateButtonHelper("NO ACTION", actionsMenu, new Vector2(0.55f, 0.1f), new Vector2(0.85f, 0.9f));
 
             actionsMenu.gameObject.SetActive(false);
+
+            battleView.TextMessage = CreateButtonHelper("ATTACK", (RectTransform)canvas.transform, new Vector2(0.1f, 0.01f), new Vector2(0.9f, 0.09f));
+            battleView.TextMessage.gameObject.SetActive(false);
         }
 
         private Button CreateButtonHelper(string text, RectTransform parent, Vector2 minAnchor, Vector2 maxAnchor)

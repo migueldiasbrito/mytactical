@@ -17,6 +17,7 @@ namespace mdb.MyTactial.Controller
         public int ACTIONS_MENU { get; private set; }
         public int SELECT_TARGET { get; private set; }
         public int ATTACK_TARGET { get; private set; }
+        public int END_ATTACK { get; private set; }
         public int NO_ACTION { get; private set; }
         public int START_NEXT_UNIT_TURN { get; private set; }
         public int END_TURN { get; private set; }
@@ -31,6 +32,7 @@ namespace mdb.MyTactial.Controller
         public readonly State MoveUnit = new State();
         public readonly State ActionsMenu = new State();
         public readonly State SelectTarget = new State();
+        public readonly State Attack = new State();
         public readonly State EndUnitTurn = new State();
         public readonly State EndTurn = new State();
         public readonly State EndBattle = new State();
@@ -69,7 +71,10 @@ namespace mdb.MyTactial.Controller
             transitions.Add(new Transition(ActionsMenu, EndUnitTurn));
 
             ATTACK_TARGET = transitions.Count;
-            transitions.Add(new Transition(SelectTarget, EndUnitTurn));
+            transitions.Add(new Transition(SelectTarget, Attack));
+
+            END_ATTACK = transitions.Count;
+            transitions.Add(new Transition(Attack, EndUnitTurn));
 
             START_NEXT_UNIT_TURN = transitions.Count;
             transitions.Add(new Transition(EndUnitTurn, StartUnitTurn));
