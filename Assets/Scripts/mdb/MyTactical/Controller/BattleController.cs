@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 using mdb.MyTactial.Model;
@@ -17,6 +18,7 @@ namespace mdb.MyTactial.Controller
 
         [SerializeField]
         private Battle _battle;
+
         private Queue<Unit> _turnUnitsOrder;
         private Cell[] _currentUnitReachableCells;
         private Unit[] _currentTargetUnits = new Unit[0];
@@ -51,6 +53,7 @@ namespace mdb.MyTactial.Controller
             BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
             BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
             BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
+            BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
 
@@ -58,6 +61,8 @@ namespace mdb.MyTactial.Controller
 
             BattleStateMachine.instance.MoveUnit.OnClickEvent += OnMoveUnitClick;
             BattleStateMachine.instance.SelectTarget.OnClickEvent += OnSelectTargetClick;
+            BattleStateMachine.instance.Attack.OnClickEvent += OnAttackClick;
+            BattleStateMachine.instance.UnitDefeated.OnClickEvent += OnUnitDefeatedClick;
         }
 
         private void OnStartBattle()
@@ -105,7 +110,7 @@ namespace mdb.MyTactial.Controller
 
         private void OnStartUnitTurn()
         {
-            CurrentUnit.SetActive(Unit.State.Active);
+            CurrentUnit.SetState(Unit.State.Active);
 
             GetUnitPossibleReachableCells();
 
@@ -138,6 +143,14 @@ namespace mdb.MyTactial.Controller
             GetUnitPossibleTargets();
         }
 
+        private void OnSelectTarget()
+        {
+            foreach (Unit unit in _currentTargetUnits)
+            {
+                unit.SetState(Unit.State.Target);
+            }
+        }
+
         private void OnSelectTargetClick(object obj)
         {
             if (obj is Unit unit)
@@ -145,26 +158,42 @@ namespace mdb.MyTactial.Controller
                 CurrentTarget = unit;
                 foreach (Unit target in _currentTargetUnits)
                 {
-                    target.SetActive(Unit.State.Idle);
+                    target.SetState(Unit.State.Idle);
                 }
                 _currentTargetUnits = new Unit[0];
 
-                unit.GetAttackedBy(CurrentUnit);
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
             }
         }
 
-        private void OnSelectTarget()
+        private void OnAttack()
         {
-            foreach (Unit unit in _currentTargetUnits)
+            int damage = Math.Max(CurrentTarget.Attack - CurrentTarget.Defense, 1);
+
+            CurrentTarget.DecreaseHealthPointsBy(damage);
+        }
+
+        private void OnAttackClick(object obj)
+        {
+            if (CurrentTarget.CurrentHealthPoints > 0)
             {
-                unit.SetActive(Unit.State.Target);
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_ATTACK);
             }
+            else
+            {
+                CurrentTarget.Cell.UnitExit();
+                CurrentTarget.SetState(Unit.State.Dead);
+                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.UNIT_DEFEATED);
+            }
+        }
+        private void OnUnitDefeatedClick(object obj)
+        {
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_UNIT_DEFEATED);
         }
 
         private void OnEndUnitTurn()
         {
-            CurrentUnit.SetActive(Unit.State.Idle);
+            CurrentUnit.SetState(Unit.State.Idle);
             CurrentTarget = null;
 
             do

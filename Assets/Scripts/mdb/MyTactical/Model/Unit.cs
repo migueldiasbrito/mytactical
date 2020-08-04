@@ -21,6 +21,9 @@ namespace mdb.MyTactial.Model
         }
 
         public string Name { get { return _name; } }
+        public int CurrentHealthPoints { get { return _currentHealthPoints; } }
+        public int Attack { get { return _attack; } }
+        public int Defense { get { return _defense; } }
         public int Agility { get { return _agility; } }
         public int Movement { get { return _movement; } }
 
@@ -56,18 +59,12 @@ namespace mdb.MyTactial.Model
             _currentHealthPoints = _healthPoints;
         }
 
-        public void GetAttackedBy(Unit unit)
+        public void DecreaseHealthPointsBy(int damage)
         {
-            _currentHealthPoints -= Math.Max(unit._attack - _defense, 1);
-
-            if (_currentHealthPoints <= 0)
-            {
-                Cell.UnitExit();
-                SetActive(State.Dead);
-            }
+            _currentHealthPoints = Math.Max(_currentHealthPoints - damage, 0);
         }
 
-        public void SetActive(State state)
+        public void SetState(State state)
         {
             _state = state;
             StateChangedCallback?.Invoke(_state);

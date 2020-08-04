@@ -46,6 +46,7 @@ namespace mdb.MyTactial.View.UIView
             BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
             BattleStateMachine.instance.ActionsMenu.OnExit += OnActionsMenuExit;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
+            BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
 
             AttackButton.onClick.AddListener(Attack);
             NoActionButton.onClick.AddListener(NoAction);
@@ -84,10 +85,20 @@ namespace mdb.MyTactial.View.UIView
         {
             _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks " + BattleController.instance.CurrentTarget.Name);
 
-            if(BattleController.instance.CurrentTarget.GetState() == Unit.State.Dead)
+            /*if(BattleController.instance.CurrentTarget.GetState() == Unit.State.Dead)
             {
                 _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
-            }
+            }*/
+
+            MessageText.text = _messages.Dequeue();
+            MessageText.gameObject.SetActive(true);
+
+            MessageButton.gameObject.SetActive(true);
+        }
+
+        private void OnUnitDefeated()
+        {
+            _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
 
             MessageText.text = _messages.Dequeue();
             MessageText.gameObject.SetActive(true);
@@ -115,7 +126,8 @@ namespace mdb.MyTactial.View.UIView
             {
                 MessageText.gameObject.SetActive(false);
                 MessageButton.gameObject.SetActive(false);
-                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_ATTACK);
+
+                BattleStateMachine.instance.OnClick(null);
             }
         }
     }
