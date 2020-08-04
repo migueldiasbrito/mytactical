@@ -82,19 +82,27 @@ namespace mdb.MyTactial.Controller
 
             for(int teamIndex = 0; teamIndex < _battle.Teams.Length; teamIndex++)
             {
-                units.AddRange(_battle.Teams[teamIndex].Units);
+                for (int unitIndex = 0; unitIndex < _battle.Teams[teamIndex].Units.Length; unitIndex++)
+                {
+                    Unit unit = _battle.Teams[teamIndex].Units[unitIndex];
+                    if (unit.GetState() != Unit.State.Dead)
+                    {
+                        units.Add(unit);
+                    }
+                }
             }
 
             units.Sort(TurnOrderSort);
 
             _turnUnitsOrder = new Queue<Unit>(units);
 
+            _currentUnit = _turnUnitsOrder.Dequeue();
+
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_FIRST_UNIT_TURN);
         }
 
         private void OnStartUnitTurn()
         {
-            _currentUnit = _turnUnitsOrder.Dequeue();
             _currentUnit.SetActive(Unit.State.Active);
 
             GetUnitPossibleReachableCells();
@@ -132,6 +140,13 @@ namespace mdb.MyTactial.Controller
         {
             if (obj is Unit unit)
             {
+                foreach (Unit target in _currentTargetUnits)
+                {
+                    target.SetActive(Unit.State.Idle);
+                }
+                _currentTargetUnits = new Unit[0];
+
+                unit.GetAttackedBy(_currentUnit);
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
             }
         }
@@ -148,21 +163,20 @@ namespace mdb.MyTactial.Controller
         {
             _currentUnit.SetActive(Unit.State.Idle);
 
-            foreach (Unit unit in _currentTargetUnits)
+            do
             {
-                unit.SetActive(Unit.State.Idle);
-            }
+                if (_turnUnitsOrder.Count > 0)
+                {
+                    _currentUnit = _turnUnitsOrder.Dequeue();
+                }
+                else
+                {
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_TURN);
+                    return;
+                }
+            } while (_currentUnit.GetState() == Unit.State.Dead);
 
-            _currentTargetUnits = new Unit[0];
-
-            if (_turnUnitsOrder.Count > 0)
-            {
-                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_NEXT_UNIT_TURN);
-            }
-            else
-            {
-                BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.END_TURN);
-            }
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.START_NEXT_UNIT_TURN);
         }
 
         private void OnEndTurn()

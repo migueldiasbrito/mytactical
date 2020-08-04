@@ -70,6 +70,7 @@ namespace mdb.MyTactial.Model
                 for (int unitIndex = 0; unitIndex < _teams[teamIndex].Units.Length; unitIndex++, positionIndex++)
                 {
                     _teams[teamIndex].Units[unitIndex].Team = _teams[teamIndex];
+                    _teams[teamIndex].Units[unitIndex].Init();
                 }
             }
         }

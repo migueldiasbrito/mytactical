@@ -58,6 +58,10 @@ namespace mdb.MyTactial.View.UIView
                     }
                     _button.enabled = true;
                     break;
+                case Unit.State.Dead:
+                    _image.enabled = false;
+                    _button.enabled = false;
+                    break;
             }
         }
 
