@@ -15,12 +15,12 @@ namespace mdb.MyTactial.Controller
 
 		public Unit CurrentUnit { get; private set; }
 		public Unit CurrentTarget { get; private set; }
+		public Cell[] CurrentUnitReachableCells { get; private set; }
 
-        [SerializeField]
+		[SerializeField]
         private Battle _battle;
 
         private Queue<Unit> _turnUnitsOrder;
-        private Cell[] _currentUnitReachableCells;
         private Unit[] _currentTargetUnits = new Unit[0];
 
         public bool HasTargets()
@@ -121,12 +121,7 @@ namespace mdb.MyTactial.Controller
         {
             if (obj is Cell cell)
             {
-                if (cell == CurrentUnit.Cell)
-                {
-                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ACTIONS_MENU);
-                }
-
-                if (cell.IsActive() && cell.UnitEnter(CurrentUnit))
+                if (cell == CurrentUnit.Cell || (cell.IsActive() && cell.UnitEnter(CurrentUnit)))
                 {
                     BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ACTIONS_MENU);
                 }
@@ -135,7 +130,7 @@ namespace mdb.MyTactial.Controller
 
         private void OnMoveUnitExit()
         {
-            foreach (Cell cell in _currentUnitReachableCells)
+            foreach (Cell cell in CurrentUnitReachableCells)
             {
                 cell.SetActive(false);
             }
@@ -272,7 +267,7 @@ namespace mdb.MyTactial.Controller
                 }
             }
 
-            _currentUnitReachableCells = cells.ToArray();
+            CurrentUnitReachableCells = cells.ToArray();
         }
 
         private void GetUnitPossibleTargets()
