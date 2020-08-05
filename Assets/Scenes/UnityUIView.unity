@@ -7104,6 +7104,12 @@ GameObject:
   - component: {fileID: 863321355}
   - component: {fileID: 863321354}
   - component: {fileID: 863321353}
+  - component: {fileID: 863321362}
+  - component: {fileID: 863321361}
+  - component: {fileID: 863321360}
+  - component: {fileID: 863321359}
+  - component: {fileID: 863321358}
+  - component: {fileID: 863321357}
   m_Layer: 0
   m_Name: T1U4
   m_TagString: Untagged
@@ -7223,6 +7229,88 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863321351}
   m_CullTransparentMesh: 0
+--- !u!114 &863321357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563e063d4cd59e948aae228d3fec7a54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &863321358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15849ae85cf5e994b86add3cf30b77d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &863321359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35a53c88b649fe24791ebcb2f18d1562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &863321360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4a5040967ee1ac4e82735a8729ed303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cellIndex: 1e0000001f0000002000000021000000220000002300000024000000250000002600000027000000
+--- !u!114 &863321361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25630cab5bb38054792eb4d1d20b9a15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &863321362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863321351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093c4d45ae695af41b2d5ddc3fd737bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamIndex: 1
+  UnitIndex: 4
+  _behaviours:
+  - Condition: {fileID: 863321361}
+    Action: {fileID: 863321359}
+  - Condition: {fileID: 863321360}
+    Action: {fileID: 863321358}
+  - Condition: {fileID: 0}
+    Action: {fileID: 863321357}
 --- !u!1 &879042515
 GameObject:
   m_ObjectHideFlags: 0
@@ -14597,6 +14685,12 @@ GameObject:
   - component: {fileID: 1892515114}
   - component: {fileID: 1892515113}
   - component: {fileID: 1892515112}
+  - component: {fileID: 1892515121}
+  - component: {fileID: 1892515120}
+  - component: {fileID: 1892515119}
+  - component: {fileID: 1892515118}
+  - component: {fileID: 1892515117}
+  - component: {fileID: 1892515116}
   m_Layer: 0
   m_Name: T1U5
   m_TagString: Untagged
@@ -14716,6 +14810,88 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1892515110}
   m_CullTransparentMesh: 0
+--- !u!114 &1892515116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563e063d4cd59e948aae228d3fec7a54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1892515117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15849ae85cf5e994b86add3cf30b77d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1892515118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35a53c88b649fe24791ebcb2f18d1562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1892515119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4a5040967ee1ac4e82735a8729ed303, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cellIndex: 1e0000001f0000002000000021000000220000002300000024000000250000002600000027000000
+--- !u!114 &1892515120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25630cab5bb38054792eb4d1d20b9a15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1892515121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892515110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093c4d45ae695af41b2d5ddc3fd737bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamIndex: 1
+  UnitIndex: 5
+  _behaviours:
+  - Condition: {fileID: 1892515120}
+    Action: {fileID: 1892515118}
+  - Condition: {fileID: 1892515119}
+    Action: {fileID: 1892515117}
+  - Condition: {fileID: 0}
+    Action: {fileID: 1892515116}
 --- !u!1 &1893118791
 GameObject:
   m_ObjectHideFlags: 0
