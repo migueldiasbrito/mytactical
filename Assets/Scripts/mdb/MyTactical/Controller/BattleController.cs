@@ -240,10 +240,11 @@ namespace mdb.MyTactial.Controller
 
         private void GetUnitPossibleReachableCells()
         {
-            List<Cell> cells = new List<Cell>();
-            List<CellPathHelper> cellsHelper = new List<CellPathHelper>();
-
-            cellsHelper.Add(new CellPathHelper { Cell = CurrentUnit.Cell, Distance = 0 });
+            HashSet<Cell> cells = new HashSet<Cell>();
+            List<CellPathHelper> cellsHelper = new List<CellPathHelper>
+            {
+                new CellPathHelper { Cell = CurrentUnit.Cell, Distance = 0 }
+            };
             cells.Add(CurrentUnit.Cell);
             CurrentUnit.Cell.SetActive(true);
 
@@ -260,14 +261,17 @@ namespace mdb.MyTactial.Controller
 
                     if (cellHelper.Distance + 1 <= CurrentUnit.Movement)
                     {
-                        cellsHelper.Add(new CellPathHelper { Cell = cell, Distance = cellHelper.Distance + 1 });
-                        cells.Add(cell);
-                        cell.SetActive(true);
+                        if (cells.Add(cell))
+                        {
+                            cellsHelper.Add(new CellPathHelper { Cell = cell, Distance = cellHelper.Distance + 1 });
+                            cell.SetActive(true);
+                        }
                     }
                 }
             }
 
-            CurrentUnitReachableCells = cells.ToArray();
+            CurrentUnitReachableCells = new Cell[cells.Count];
+            cells.CopyTo(CurrentUnitReachableCells);
         }
 
         private void GetUnitPossibleTargets()
