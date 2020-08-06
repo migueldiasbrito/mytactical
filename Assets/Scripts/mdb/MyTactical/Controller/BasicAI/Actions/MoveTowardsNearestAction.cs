@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 using mdb.MyTactial.Model;
 
@@ -37,8 +39,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                     {
                         if(ajdacentCell.Unit != null && ajdacentCell.Unit.Team != Unit.Team)
                         {
-                            BattleStateMachine.instance.OnClick(currentCell.LastReachableCell);
-                            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
+                            StartCoroutine(SelectCell(currentCell.LastReachableCell));
                             return true;
                         }
                     }
@@ -54,10 +55,25 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
             return false;
         }
 
+        private IEnumerator SelectCell(Cell cell)
+        {
+            yield return new WaitForSeconds(1);
+
+            BattleStateMachine.instance.OnClick(cell);
+            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
+        }
+
         private void OnSelectAction()
         {
-            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
             BattleStateMachine.instance.SelectAction.OnEnter -= OnSelectAction;
+            StartCoroutine(SelectAction());
+        }
+
+        private IEnumerator SelectAction()
+        {
+            yield return new WaitForSeconds(1);
+
+            BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
         }
     }
 }

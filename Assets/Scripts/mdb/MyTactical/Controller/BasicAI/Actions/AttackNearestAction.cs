@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 using mdb.MyTactial.Model;
 
@@ -10,10 +12,9 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
 
         public override bool DoAction(object[] arguments)
         {
-            Cell cell = null;
-
             if (arguments != null)
             {
+                Cell cell = null;
                 for (int argumentIndex = 0; argumentIndex < arguments.Length; argumentIndex++)
                 {
                     if (arguments[argumentIndex] is Cell)
@@ -27,7 +28,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
 
                     if (cell != null && _target != null)
                     {
-                        AttackNearest(cell);
+                        StartCoroutine(AttackNearest(cell));
                         return true;
                     }
                 }
@@ -44,7 +45,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                         if (adjacentCell.Unit != null && adjacentCell.Unit.Team != Unit.Team)
                         {
                             _target = adjacentCell.Unit;
-                            AttackNearest(cell);
+                            AttackNearest(reachableCell);
                             return true;
                         }
                     }
@@ -54,8 +55,10 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
             return false;
         }
 
-        private void AttackNearest(Cell cell)
+        private IEnumerator AttackNearest(Cell cell)
         {
+            yield return new WaitForSeconds(1);
+
             BattleStateMachine.instance.OnClick(cell);
 
             BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
@@ -70,9 +73,15 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
 
         private void OnSelectTarget()
         {
-            BattleStateMachine.instance.OnClick(_target);
             BattleStateMachine.instance.SelectTarget.OnEnter -= OnSelectTarget;
+            StartCoroutine(SelectTarget());
+        }
 
+        private IEnumerator SelectTarget()
+        {
+            yield return new WaitForSeconds(1);
+
+            BattleStateMachine.instance.OnClick(_target);
             _target = null;
         }
     }
