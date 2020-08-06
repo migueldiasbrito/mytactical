@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 using mdb.MyTactial.Model;
 
@@ -7,8 +6,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
 {
     public class HasCellBeenReached : Condition
     {
-        [SerializeField]
-        private int[] _cellIndex = new int[0];
+        public int[] CellIndex = new int[0];
 
         private List<Cell> _cells;
 
@@ -16,7 +14,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
         {
             _cells = new List<Cell>();
 
-            foreach (int cellIndex in _cellIndex)
+            foreach (int cellIndex in CellIndex)
             {
                 _cells.Add(BattleController.instance.Battle.Cells[cellIndex]);
             }
@@ -26,7 +24,8 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
 
         private void OnMoveUnitExit()
         {
-            if (_cells.Contains(BattleController.instance.CurrentUnit.Cell))
+            if (BattleController.instance.CurrentUnit.Team != Unit.Team &&
+                _cells.Contains(BattleController.instance.CurrentUnit.Cell))
             {
                 TestCondition = true;
                 BattleStateMachine.instance.MoveUnit.OnExit -= OnMoveUnitExit;

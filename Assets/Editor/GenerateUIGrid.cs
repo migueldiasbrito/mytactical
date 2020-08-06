@@ -4,6 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
+using mdb.MyTactial.Controller.BasicAI;
+using mdb.MyTactial.Controller.BasicAI.Actions;
+using mdb.MyTactial.Controller.BasicAI.Conditions;
 using mdb.MyTactial.Model;
 using mdb.MyTactial.View.UIView;
 using mdb.Tools;
@@ -12,6 +15,14 @@ namespace mdb.MyTactial.EditorTools
 {
     public class GenerateUIGrid : EditorWindow
     {
+        public enum AIUnitPrefabBehaviour {
+            None,
+            AlwaysMoveTowardsTargets,
+            MoveAfterUnitsDefeated,
+            MoveAfterCellsReached,
+            OnlyMoveToAttack
+        }
+
         [Serializable]
         public struct UnitBuilder
         {
@@ -19,11 +30,34 @@ namespace mdb.MyTactial.EditorTools
             public int x;
             public int y;
 
+            public AIUnitPrefabBehaviour AIBehaviour;
+            public int[] behaviourHelper;
+
             public UnitBuilder(string name, int x, int y)
             {
                 this.name = name;
                 this.x = x;
                 this.y = y;
+                this.AIBehaviour = AIUnitPrefabBehaviour.None;
+                behaviourHelper = new int[0];
+            }
+
+            public UnitBuilder(string name, int x, int y, AIUnitPrefabBehaviour behaviour)
+            {
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.AIBehaviour = behaviour;
+                behaviourHelper = new int[0];
+            }
+
+            public UnitBuilder(string name, int x, int y, AIUnitPrefabBehaviour behaviour, int[] helper)
+            {
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.AIBehaviour = behaviour;
+                behaviourHelper = helper;
             }
         }
 
@@ -58,14 +92,14 @@ namespace mdb.MyTactial.EditorTools
                 AIControlled = true,
                 Color = Color.red,
                 Units = new UnitBuilder[] {
-                    new UnitBuilder("Red Unit", 3, 9),
-                    new UnitBuilder("Red Unit", 4, 9),
-                    new UnitBuilder("Red Unit", 5, 9),
-                    new UnitBuilder("Red Unit", 6, 9),
-                    new UnitBuilder("Red Unit", 4, 8),
-                    new UnitBuilder("Red Unit", 5, 8),
-                    new UnitBuilder("Red Unit", 4, 7),
-                    new UnitBuilder("Red Unit", 5, 7)
+                    new UnitBuilder("Red Unit", 3, 9, AIUnitPrefabBehaviour.MoveAfterCellsReached, new int[10] { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59 }),
+                    new UnitBuilder("Red Unit", 4, 9, AIUnitPrefabBehaviour.OnlyMoveToAttack),
+                    new UnitBuilder("Red Unit", 5, 9, AIUnitPrefabBehaviour.OnlyMoveToAttack),
+                    new UnitBuilder("Red Unit", 6, 9, AIUnitPrefabBehaviour.MoveAfterCellsReached, new int[10] { 50, 51, 52, 53, 54, 55, 56, 57, 58, 59 }),
+                    new UnitBuilder("Red Unit", 4, 8, AIUnitPrefabBehaviour.MoveAfterUnitsDefeated, new int[2] { 6, 7 }),
+                    new UnitBuilder("Red Unit", 5, 8, AIUnitPrefabBehaviour.MoveAfterUnitsDefeated, new int[2] { 6, 7 }),
+                    new UnitBuilder("Red Unit", 4, 7, AIUnitPrefabBehaviour.AlwaysMoveTowardsTargets),
+                    new UnitBuilder("Red Unit", 5, 7, AIUnitPrefabBehaviour.AlwaysMoveTowardsTargets)
                 }
             }
         };
@@ -219,6 +253,72 @@ namespace mdb.MyTactial.EditorTools
                     unitView.UnitIndex = unitIndex;
 
                     unitTransform.gameObject.GetComponent<Image>().color = Teams[teamIndex].Color;
+
+                    if(Teams[teamIndex].AIControlled)
+                    {
+                        BasicAIUnitController controller = unitTransform.gameObject.AddComponent<BasicAIUnitController>();
+                        controller.TeamIndex = teamIndex;
+                        controller.UnitIndex = unitIndex;
+
+                        switch (unitBuilder.AIBehaviour)
+                        {
+                            case AIUnitPrefabBehaviour.AlwaysMoveTowardsTargets:
+                                controller.Behaviours = new BasicAIUnitController.Pair[2];
+                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = null,
+                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                };
+                                break;
+                            case AIUnitPrefabBehaviour.MoveAfterUnitsDefeated:
+                                controller.Behaviours = new BasicAIUnitController.Pair[3];
+                                HasUnitsBeenDefeated hasUnitsBeenDefeated = unitTransform.gameObject.AddComponent<HasUnitsBeenDefeated>();
+                                hasUnitsBeenDefeated.UnitsIndex = unitBuilder.behaviourHelper;
+                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = hasUnitsBeenDefeated,
+                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                };
+                                controller.Behaviours[2] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = null,
+                                    Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
+                                };
+                                break;
+                            case AIUnitPrefabBehaviour.MoveAfterCellsReached:
+                                controller.Behaviours = new BasicAIUnitController.Pair[3];
+                                HasCellBeenReached hasCellBeenReached = unitTransform.gameObject.AddComponent<HasCellBeenReached>();
+                                hasCellBeenReached.CellIndex = unitBuilder.behaviourHelper;
+                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = hasCellBeenReached,
+                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                };
+                                controller.Behaviours[2] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = null,
+                                    Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
+                                };
+                                break;
+                            case AIUnitPrefabBehaviour.OnlyMoveToAttack:
+                                controller.Behaviours = new BasicAIUnitController.Pair[2];
+                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                {
+                                    Condition = null,
+                                    Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
+                                };
+                                break;
+                            default:
+                                Debug.LogError("AI Units without configured behaviours.");
+                                break;
+                        }
+
+                        controller.Behaviours[0] = new BasicAIUnitController.Pair
+                        {
+                            Condition = unitTransform.gameObject.AddComponent<HasReachableTarget>(),
+                            Action = unitTransform.gameObject.AddComponent<AttackNearestAction>()
+                        };
+                    }
                 }
                 teams[teamIndex].Units = units;
             }

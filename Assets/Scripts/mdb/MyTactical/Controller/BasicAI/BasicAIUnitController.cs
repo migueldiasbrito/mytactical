@@ -9,7 +9,7 @@ namespace mdb.MyTactial.Controller.BasicAI
     public class BasicAIUnitController : MonoBehaviour
     {
         [Serializable]
-        private struct Pair
+        public struct Pair
         {
             public Condition Condition;
             public Actions.Action Action;
@@ -26,15 +26,14 @@ namespace mdb.MyTactial.Controller.BasicAI
 
         private Unit _unit;
 
-        [SerializeField]
-        private Pair[] _behaviours = new Pair[0];
+        public Pair[] Behaviours = new Pair[0];
 
         private void Start()
         {
             _unit = BattleController.instance.Battle.Teams[TeamIndex].Units[UnitIndex];
             BattleStateMachine.instance.MoveUnit.OnEnter += OnMoveUnit;
 
-            foreach (Pair pair in _behaviours)
+            foreach (Pair pair in Behaviours)
             {
                 if (pair.Condition != null)
                 {
@@ -48,7 +47,7 @@ namespace mdb.MyTactial.Controller.BasicAI
         {
             if (BattleController.instance.CurrentUnit == _unit)
             {
-                foreach (Pair pair in _behaviours)
+                foreach (Pair pair in Behaviours)
                 {
                     if (pair.Condition == null)
                     {
