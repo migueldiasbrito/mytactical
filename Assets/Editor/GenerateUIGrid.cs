@@ -31,6 +31,7 @@ namespace mdb.MyTactial.EditorTools
         public struct Team
         {
             public string Name;
+            public bool AIControlled;
             public Color Color;
             public UnitBuilder[] Units;
         }
@@ -43,6 +44,7 @@ namespace mdb.MyTactial.EditorTools
         public Team[] Teams = new Team[] {
             new Team{
                 Name = "Blue",
+                AIControlled = false,
                 Color = Color.blue,
                 Units = new UnitBuilder[] {
                     new UnitBuilder("Blue Unit", 3, 0),
@@ -53,6 +55,7 @@ namespace mdb.MyTactial.EditorTools
             },
             new Team{
                 Name = "Red",
+                AIControlled = true,
                 Color = Color.red,
                 Units = new UnitBuilder[] {
                     new UnitBuilder("Red Unit", 3, 9),
@@ -195,7 +198,7 @@ namespace mdb.MyTactial.EditorTools
             List<int> initialPositions = new List<int>();
             for (int teamIndex = 0; teamIndex < Teams.Length; teamIndex++)
             {
-                teams[teamIndex] = new Model.Team(Teams[teamIndex].Name);
+                teams[teamIndex] = new Model.Team(Teams[teamIndex].Name, Teams[teamIndex].AIControlled);
                 Unit[] units = new Unit[Teams[teamIndex].Units.Length];
                 for (int unitIndex = 0; unitIndex < Teams[teamIndex].Units.Length; unitIndex++)
                 {

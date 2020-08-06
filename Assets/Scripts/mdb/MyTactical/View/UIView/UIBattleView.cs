@@ -75,9 +75,11 @@ namespace mdb.MyTactial.View.UIView
 
         private void OnSelectAction()
         {
-            AttackButton.gameObject.SetActive (BattleController.instance.HasTargets()) ;
-
-            ActionsMenu.SetActive(true);
+            if (!BattleController.instance.CurrentUnit.Team.IsAIControlled)
+            {
+                AttackButton.gameObject.SetActive(BattleController.instance.HasTargets());
+                ActionsMenu.SetActive(true);
+            }
         }
 
         private void OnSelectActionExit()

@@ -82,7 +82,7 @@ namespace mdb.MyTactial.View.UIView
 
         private void OnClick()
         {
-            if (_unit.GetState() == Unit.State.Target)
+            if (_unit.GetState() == Unit.State.Target && !BattleController.instance.CurrentUnit.Team.IsAIControlled)
             {
                 BattleStateMachine.instance.OnClick(_unit);
             }

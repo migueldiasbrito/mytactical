@@ -3694,6 +3694,8 @@ GameObject:
   - component: {fileID: 571223302}
   - component: {fileID: 571223301}
   - component: {fileID: 571223300}
+  - component: {fileID: 571223305}
+  - component: {fileID: 571223304}
   m_Layer: 0
   m_Name: T1U3
   m_TagString: Untagged
@@ -3813,6 +3815,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 571223298}
   m_CullTransparentMesh: 0
+--- !u!114 &571223304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571223298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563e063d4cd59e948aae228d3fec7a54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &571223305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 571223298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093c4d45ae695af41b2d5ddc3fd737bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamIndex: 1
+  UnitIndex: 3
+  _behaviours:
+  - Condition: {fileID: 0}
+    Action: {fileID: 571223304}
 --- !u!1 &577304929
 GameObject:
   m_ObjectHideFlags: 0
@@ -6109,6 +6140,8 @@ GameObject:
   - component: {fileID: 748707180}
   - component: {fileID: 748707179}
   - component: {fileID: 748707178}
+  - component: {fileID: 748707183}
+  - component: {fileID: 748707182}
   m_Layer: 0
   m_Name: T1U2
   m_TagString: Untagged
@@ -6228,6 +6261,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 748707176}
   m_CullTransparentMesh: 0
+--- !u!114 &748707182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748707176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563e063d4cd59e948aae228d3fec7a54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &748707183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748707176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 093c4d45ae695af41b2d5ddc3fd737bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TeamIndex: 1
+  UnitIndex: 2
+  _behaviours:
+  - Condition: {fileID: 0}
+    Action: {fileID: 748707182}
 --- !u!1 &750140386
 GameObject:
   m_ObjectHideFlags: 0
@@ -10927,6 +10989,7 @@ MonoBehaviour:
     _cells: []
     _teams:
     - _name: Blue
+      _isAIControlled: 0
       _units:
       - _name: Blue Unit
         _healthPoints: 1
@@ -10953,6 +11016,7 @@ MonoBehaviour:
         _agility: 1
         _movement: 1
     - _name: Red
+      _isAIControlled: 1
       _units:
       - _name: Red Unit
         _healthPoints: 1

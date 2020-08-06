@@ -34,7 +34,8 @@ namespace mdb.MyTactial.View.UIView
         private void CellStateChanged(bool active)
         {
             _image.color = active ? Color.black : _defaultColor;
-            _button.enabled = active;
+
+            _button.enabled = !BattleController.instance.CurrentUnit.Team.IsAIControlled;
         }
 
         private void OnClick()
