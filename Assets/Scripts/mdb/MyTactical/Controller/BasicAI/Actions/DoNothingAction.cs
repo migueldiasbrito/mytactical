@@ -5,15 +5,15 @@
         public override bool DoAction(object[] arguments)
         {
             BattleStateMachine.instance.OnClick(Unit.Cell);
-            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
+            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
 
             return true;
         }
 
-        private void OnActionsMenu()
+        private void OnSelectAction()
         {
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
-            BattleStateMachine.instance.ActionsMenu.OnEnter -= OnActionsMenu;
+            BattleStateMachine.instance.SelectAction.OnEnter -= OnSelectAction;
         }
     }
 }

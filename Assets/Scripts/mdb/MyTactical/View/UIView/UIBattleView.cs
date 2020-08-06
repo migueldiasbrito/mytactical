@@ -44,8 +44,8 @@ namespace mdb.MyTactial.View.UIView
         {
             BattleStateMachine.instance.BuildMap.OnExit += OnBuildMapExit;
 
-            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
-            BattleStateMachine.instance.ActionsMenu.OnExit += OnActionsMenuExit;
+            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
+            BattleStateMachine.instance.SelectAction.OnExit += OnSelectActionExit;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
             BattleStateMachine.instance.EndBattle.OnEnter += OnEndBattle;
@@ -73,14 +73,14 @@ namespace mdb.MyTactial.View.UIView
             }
         }
 
-        private void OnActionsMenu()
+        private void OnSelectAction()
         {
             AttackButton.gameObject.SetActive (BattleController.instance.HasTargets()) ;
 
             ActionsMenu.SetActive(true);
         }
 
-        private void OnActionsMenuExit()
+        private void OnSelectActionExit()
         {
             ActionsMenu.SetActive(false);
         }

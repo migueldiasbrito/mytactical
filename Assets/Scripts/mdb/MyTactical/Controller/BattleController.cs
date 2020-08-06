@@ -123,7 +123,7 @@ namespace mdb.MyTactial.Controller
             {
                 if (cell == CurrentUnit.Cell || (cell.IsActive() && cell.UnitEnter(CurrentUnit)))
                 {
-                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ACTIONS_MENU);
+                    BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.SELECT_ACTION);
                 }
             }
         }

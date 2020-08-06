@@ -58,14 +58,14 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
         {
             BattleStateMachine.instance.OnClick(cell);
 
-            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
+            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
             BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
         }
 
-        private void OnActionsMenu()
+        private void OnSelectAction()
         {
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.SELECT_TARGET);
-            BattleStateMachine.instance.ActionsMenu.OnEnter -= OnActionsMenu;
+            BattleStateMachine.instance.SelectAction.OnEnter -= OnSelectAction;
         }
 
         private void OnSelectTarget()

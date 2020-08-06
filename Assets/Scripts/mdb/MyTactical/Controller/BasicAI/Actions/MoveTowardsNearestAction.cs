@@ -38,7 +38,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                         if(ajdacentCell.Unit != null && ajdacentCell.Unit.Team != Unit.Team)
                         {
                             BattleStateMachine.instance.OnClick(currentCell.LastReachableCell);
-                            BattleStateMachine.instance.ActionsMenu.OnEnter += OnActionsMenu;
+                            BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
                             return true;
                         }
                     }
@@ -54,10 +54,10 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
             return false;
         }
 
-        private void OnActionsMenu()
+        private void OnSelectAction()
         {
             BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.NO_ACTION);
-            BattleStateMachine.instance.ActionsMenu.OnEnter -= OnActionsMenu;
+            BattleStateMachine.instance.SelectAction.OnEnter -= OnSelectAction;
         }
     }
 }
