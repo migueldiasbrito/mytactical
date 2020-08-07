@@ -46,6 +46,7 @@ namespace mdb.MyTactial.View.UIView
 
             BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
             BattleStateMachine.instance.SelectAction.OnExit += OnSelectActionExit;
+            BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
             BattleStateMachine.instance.EndBattle.OnEnter += OnEndBattle;
@@ -87,8 +88,21 @@ namespace mdb.MyTactial.View.UIView
             ActionsMenu.SetActive(false);
         }
 
+        private void OnSelectTarget()
+        {
+            foreach (Unit unit in BattleController.instance.CurrentTargetUnits)
+            {
+                unit.SetState(Unit.State.Target);
+            }
+        }
+
         private void OnAttack()
         {
+            foreach (Unit target in BattleController.instance.CurrentTargetUnits)
+            {
+                target.SetState(Unit.State.Idle);
+            }
+
             _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks " + BattleController.instance.CurrentTarget.Name);
             NextMessage();
         }

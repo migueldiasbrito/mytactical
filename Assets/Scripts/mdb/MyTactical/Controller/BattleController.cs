@@ -16,16 +16,16 @@ namespace mdb.MyTactial.Controller
 		public Unit CurrentUnit { get; private set; }
 		public Unit CurrentTarget { get; private set; }
 		public Cell[] CurrentUnitReachableCells { get; private set; }
+        public Unit[] CurrentTargetUnits { get; private set; }
 
 		[SerializeField]
         private Battle _battle;
 
         private Queue<Unit> _turnUnitsOrder;
-        private Unit[] _currentTargetUnits = new Unit[0];
 
         public bool HasTargets()
         {
-            return _currentTargetUnits.Length > 0;
+            return CurrentTargetUnits.Length > 0;
         }
 
         private void Awake()
@@ -52,7 +52,6 @@ namespace mdb.MyTactial.Controller
             BattleStateMachine.instance.PlaceUnits.OnEnter += OnPlaceUnits;
             BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
             BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
-            BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
@@ -138,24 +137,15 @@ namespace mdb.MyTactial.Controller
             GetUnitPossibleTargets();
         }
 
-        private void OnSelectTarget()
-        {
-            foreach (Unit unit in _currentTargetUnits)
-            {
-                unit.SetState(Unit.State.Target);
-            }
-        }
-
         private void OnSelectTargetClick(object obj)
         {
             if (obj is Unit unit)
             {
                 CurrentTarget = unit;
-                foreach (Unit target in _currentTargetUnits)
+                foreach (Unit target in CurrentTargetUnits)
                 {
                     target.SetState(Unit.State.Idle);
                 }
-                _currentTargetUnits = new Unit[0];
 
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
             }
@@ -198,6 +188,7 @@ namespace mdb.MyTactial.Controller
         {
             CurrentUnit.SetState(Unit.State.Idle);
             CurrentTarget = null;
+            CurrentTargetUnits = new Unit[0];
 
             do
             {
@@ -286,7 +277,7 @@ namespace mdb.MyTactial.Controller
                     targets.Add(cell.Unit);
                 }
             }
-            _currentTargetUnits = targets.ToArray();
+            CurrentTargetUnits = targets.ToArray();
         }
     }
 }
