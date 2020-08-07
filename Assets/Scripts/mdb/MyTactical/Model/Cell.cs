@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace mdb.MyTactial.Model
 {
@@ -15,7 +16,10 @@ namespace mdb.MyTactial.Model
         public Unit _unit;
         [NonSerialized]
         Cell[] _adjacentCells;
-        
+
+        [SerializeField]
+        private int _terrainEffect = 0;
+
         private bool _active;
 
         public bool UnitEnter(Unit unit)

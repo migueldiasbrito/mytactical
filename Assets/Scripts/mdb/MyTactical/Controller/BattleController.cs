@@ -142,10 +142,6 @@ namespace mdb.MyTactial.Controller
             if (obj is Unit unit)
             {
                 CurrentTarget = unit;
-                foreach (Unit target in CurrentTargetUnits)
-                {
-                    target.SetState(Unit.State.Idle);
-                }
 
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
             }
