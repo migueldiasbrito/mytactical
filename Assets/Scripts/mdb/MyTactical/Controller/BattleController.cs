@@ -18,6 +18,8 @@ namespace mdb.MyTactial.Controller
 		public Cell[] CurrentUnitReachableCells { get; private set; }
         public Unit[] CurrentTargetUnits { get; private set; }
 
+        public int CurrentDamage { get; private set; }
+
 		[SerializeField]
         private Battle _battle;
 
@@ -52,7 +54,6 @@ namespace mdb.MyTactial.Controller
             BattleStateMachine.instance.PlaceUnits.OnEnter += OnPlaceUnits;
             BattleStateMachine.instance.StartTurn.OnEnter += OnStartTurn;
             BattleStateMachine.instance.StartUnitTurn.OnEnter += OnStartUnitTurn;
-            BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndTurn.OnEnter += OnEndTurn;
 
@@ -142,16 +143,11 @@ namespace mdb.MyTactial.Controller
             if (obj is Unit unit)
             {
                 CurrentTarget = unit;
+                CurrentDamage = Math.Max(CurrentUnit.Attack - CurrentTarget.Defense, 1);
+                CurrentTarget.DecreaseHealthPointsBy(CurrentDamage);
 
                 BattleStateMachine.instance.AddTransition(BattleStateMachine.instance.ATTACK_TARGET);
             }
-        }
-
-        private void OnAttack()
-        {
-            int damage = Math.Max(CurrentTarget.Attack - CurrentTarget.Defense, 1);
-
-            CurrentTarget.DecreaseHealthPointsBy(damage);
         }
 
         private void OnAttackClick(object obj)

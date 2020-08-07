@@ -21,6 +21,7 @@ namespace mdb.MyTactial.Model
         }
 
         public string Name { get { return _name; } }
+        public int TotalHealthPoints { get { return _healthPoints; } }
         public int CurrentHealthPoints { get { return _currentHealthPoints; } }
         public int Attack { get { return _attack; } }
         public int Defense { get { return _defense; } }

@@ -29,6 +29,10 @@ namespace mdb.MyTactial.View.TilemapView
         public Button MessageButton;
         public Text MessageText;
 
+        public GameObject[] TeamUnitInfo;
+        public Text[] TeamUnitName;
+        public Text[] TeamUnitHP;
+
         private Queue<string> _messages = new Queue<string>();
 
         [SerializeField]
@@ -48,6 +52,25 @@ namespace mdb.MyTactial.View.TilemapView
 
         private Unit _target = null;
         private bool _selectingTarget = false;
+        private Button _activeButton;
+
+        public void ShowInfo(int teamIndex, string name, int currentHealthPoints, int totalHealthPoints)
+        {
+            if(TeamUnitInfo != null && TeamUnitInfo.Length > teamIndex && TeamUnitInfo[teamIndex] != null)
+            {
+                TeamUnitInfo[teamIndex].SetActive(true);
+
+                if (TeamUnitName != null && TeamUnitName.Length > teamIndex && TeamUnitName[teamIndex] != null)
+                {
+                    TeamUnitName[teamIndex].text = name;
+                }
+
+                if (TeamUnitHP != null && TeamUnitHP.Length > teamIndex && TeamUnitHP[teamIndex] != null)
+                {
+                    TeamUnitHP[teamIndex].text = currentHealthPoints + "/" + totalHealthPoints;
+                }
+            }
+        }
 
         private void Awake()
         {
@@ -68,6 +91,7 @@ namespace mdb.MyTactial.View.TilemapView
             BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
+            BattleStateMachine.instance.EndUnitTurn.OnEnter += OnEndUnitTurn;
             BattleStateMachine.instance.EndBattle.OnEnter += OnEndBattle;
 
             BattleStateMachine.instance.EndBattle.OnClickEvent += OnEndBattleClick;
@@ -91,11 +115,47 @@ namespace mdb.MyTactial.View.TilemapView
                 _fadeDeltaTime = 0;
             }
 
-            if (_selectingTarget)
-            {
-                _cooldownDeltaTime -= Time.deltaTime;
+            _cooldownDeltaTime -= Time.deltaTime;
 
-                if (_cooldownDeltaTime <= 0)
+            if (_cooldownDeltaTime <= 0)
+            {
+                if (MessageButton.gameObject.activeSelf && Input.GetAxisRaw("Fire1") == 1)
+                {
+                    MessageButton.onClick.Invoke();
+                    return;
+                }
+
+                if (ActionsMenu.activeSelf)
+                {
+                    if (Input.GetAxisRaw("Fire1") == 1)
+                    {
+                        _activeButton.onClick.Invoke();
+                        _cooldownDeltaTime = _inputCooldown;
+                        return;
+                    }
+
+                    float verticalInput = Input.GetAxisRaw("Vertical");
+                    float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+                    if (_activeButton == AttackButton && (verticalInput == 1 || horizontalInput == 1))
+                    {
+                        _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
+                        _activeButton = NoActionButton;
+                        _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                        _cooldownDeltaTime = _inputCooldown;
+                        return;
+                    }
+                    else if (_activeButton == AttackButton && (verticalInput == -1 || horizontalInput == -1))
+                    {
+                        _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
+                        _activeButton = AttackButton;
+                        _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                        _cooldownDeltaTime = _inputCooldown;
+                        return;
+                    }
+                }
+
+                if (_selectingTarget)
                 {
                     if (Input.GetAxisRaw("Fire1") == 1)
                     {
@@ -103,7 +163,7 @@ namespace mdb.MyTactial.View.TilemapView
                         _target.SetState(Unit.State.Idle);
                         _target = null;
                         _selectingTarget = false;
-                        _cooldownDeltaTime = 0;
+                        _cooldownDeltaTime = _inputCooldown;
                         return;
                     }
 
@@ -180,14 +240,30 @@ namespace mdb.MyTactial.View.TilemapView
         {
             if (!BattleController.instance.CurrentUnit.Team.IsAIControlled)
             {
-                AttackButton.gameObject.SetActive(BattleController.instance.HasTargets());
+                if (BattleController.instance.HasTargets())
+                {
+                    AttackButton.gameObject.SetActive(true);
+                    _activeButton = AttackButton;
+                }
+                else
+                {
+                    AttackButton.gameObject.SetActive(false);
+                    _activeButton = NoActionButton;
+                }
+
+                _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
                 ActionsMenu.SetActive(true);
+                _cooldownDeltaTime = _inputCooldown;
             }
         }
 
         private void OnSelectActionExit()
         {
-            ActionsMenu.SetActive(false);
+            if (!BattleController.instance.CurrentUnit.Team.IsAIControlled)
+            {
+                _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
+                ActionsMenu.SetActive(false);
+            }
         }
 
         private void OnSelectTarget()
@@ -202,7 +278,8 @@ namespace mdb.MyTactial.View.TilemapView
 
         private void OnAttack()
         {
-            _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks " + BattleController.instance.CurrentTarget.Name);
+            _messages.Enqueue(BattleController.instance.CurrentUnit.Name + " attacks!");
+            _messages.Enqueue("Inflicts " + BattleController.instance.CurrentDamage + " points of damage on " + BattleController.instance.CurrentTarget.Name);
             NextMessage();
         }
 
@@ -210,6 +287,17 @@ namespace mdb.MyTactial.View.TilemapView
         {
             _messages.Enqueue(BattleController.instance.CurrentTarget.Name + " defeated");
             NextMessage();
+        }
+
+        private void OnEndUnitTurn()
+        {
+            foreach (GameObject gameObject in TeamUnitInfo)
+            {
+                if (gameObject != null)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
         }
 
         private void OnEndBattle()
@@ -249,6 +337,7 @@ namespace mdb.MyTactial.View.TilemapView
 
                 BattleStateMachine.instance.OnClick(null);
             }
+            _cooldownDeltaTime = _inputCooldown;
         }
     }
 }

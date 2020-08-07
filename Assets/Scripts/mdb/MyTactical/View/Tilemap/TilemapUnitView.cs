@@ -21,6 +21,9 @@ namespace mdb.MyTactial.View.TilemapView
         [SerializeField]
         private Color _highlightFinalColor = new Color(0.1f, 0.1f, 0.1f, 1f);
 
+        [SerializeField]
+        private float _inputCooldown = 0.5f;
+
         private Unit _unit;
         private GridMovement _gridMovement;
         private Queue<Vector2> _path;
@@ -31,6 +34,7 @@ namespace mdb.MyTactial.View.TilemapView
         private Color _defaultColor = new Color(1f, 1f, 1f, 0.9f);
         private bool _targeted = false;
         private float _fadeDeltaTime = 0;
+        private float _cooldownDeltaTime = 0;
 
         public override void DoPath(Cell[] cells)
         {
@@ -105,13 +109,15 @@ namespace mdb.MyTactial.View.TilemapView
 
             if (_controlUnit && !_moving)
             {
+                _cooldownDeltaTime -= Time.deltaTime;
+
                 Vector3Int position = new Vector3Int(
                     Mathf.RoundToInt(transform.position.x),
                     Mathf.RoundToInt(transform.position.y),
                     Mathf.RoundToInt(transform.position.z)
                 );
 
-                if (Input.GetAxisRaw("Fire1") == 1)
+                if (Input.GetAxisRaw("Fire1") == 1 && _cooldownDeltaTime <= 0)
                 {
                     if (_lastCell.Unit == null || _lastCell.Unit == _unit)
                     {
@@ -123,10 +129,10 @@ namespace mdb.MyTactial.View.TilemapView
 
                 float verticalInput = Input.GetAxisRaw("Vertical");
 
-                if(Mathf.Abs(verticalInput) == 1)
+                if (Mathf.Abs(verticalInput) == 1)
                 {
                     position += new Vector3Int(0, Mathf.RoundToInt(verticalInput), 0);
-                    if(TilemapBattleView.instance.ReachableCells.ContainsKey(position))
+                    if (TilemapBattleView.instance.ReachableCells.ContainsKey(position))
                     {
                         DoPath(position, TilemapBattleView.instance.ReachableCells[position]);
                     }
@@ -163,6 +169,7 @@ namespace mdb.MyTactial.View.TilemapView
                         CameraFollow.instance.Target = gameObject;
                     }
                     _targeted = true;
+                    TilemapBattleView.instance.ShowInfo(TeamIndex, _unit.Name, _unit.CurrentHealthPoints, _unit.TotalHealthPoints);
                     break;
                 case Unit.State.Dead:
                     _spriteRenderer.enabled = false;
@@ -178,12 +185,15 @@ namespace mdb.MyTactial.View.TilemapView
                 {
                     _controlUnit = true;
                     _lastCell = _unit.Cell;
+                    _cooldownDeltaTime = _inputCooldown;
                 }
 
                 if (CameraFollow.instance != null)
                 {
                     CameraFollow.instance.Target = gameObject;
                 }
+
+                TilemapBattleView.instance.ShowInfo(TeamIndex, _unit.Name, _unit.CurrentHealthPoints, _unit.TotalHealthPoints);
             }
         }
     }

@@ -96,6 +96,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
         private void OnSelectTarget()
         {
             BattleStateMachine.instance.SelectTarget.OnEnter -= OnSelectTarget;
+            _target.SetState(Unit.State.Target);
             StartCoroutine(SelectTarget());
         }
 
@@ -103,6 +104,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
         {
             yield return new WaitForSeconds(1);
 
+            _target.SetState(Unit.State.Idle);
             BattleStateMachine.instance.OnClick(_target);
             _target = null;
         }
