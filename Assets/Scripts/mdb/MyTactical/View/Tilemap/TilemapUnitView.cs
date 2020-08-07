@@ -61,7 +61,7 @@ namespace mdb.MyTactial.View.TilemapView
             _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             _defaultColor = _spriteRenderer.color;
 
-            BattleStateMachine.instance.PlaceUnits.OnExit += OnPlaceUnitExit;
+            BattleStateMachine.instance.MoveUnit.OnEnter += OnMoveUnit;
         }
 
         private void Update()
@@ -158,6 +158,10 @@ namespace mdb.MyTactial.View.TilemapView
                     _targeted = false;
                     break;
                 case Unit.State.Target:
+                    if (CameraFollow.instance != null)
+                    {
+                        CameraFollow.instance.Target = gameObject;
+                    }
                     _targeted = true;
                     break;
                 case Unit.State.Dead:
@@ -166,20 +170,20 @@ namespace mdb.MyTactial.View.TilemapView
             }
         }
 
-        private void OnPlaceUnitExit()
-        {
-            if (!_unit.Team.IsAIControlled)
-            {
-                BattleStateMachine.instance.MoveUnit.OnEnter += OnMoveUnit;
-            }
-        }
-
         private void OnMoveUnit()
         {
             if (BattleController.instance.CurrentUnit == _unit)
             {
-                _controlUnit = true;
-                _lastCell = _unit.Cell;
+                if (!_unit.Team.IsAIControlled)
+                {
+                    _controlUnit = true;
+                    _lastCell = _unit.Cell;
+                }
+
+                if (CameraFollow.instance != null)
+                {
+                    CameraFollow.instance.Target = gameObject;
+                }
             }
         }
     }
