@@ -186,7 +186,7 @@ namespace mdb.MyTactial.EditorTools
                 {
                     Vector3Int position = new Vector3Int(column, row, 0);
                     backgroundTilemap.SetTile(position, DefaultTile);
-                    cells[row * Columns + column] = new Cell();
+                    cells[row * Columns + column] = new Cell("Cell("+column+","+row+")");
                     tilemapBattleView.CellPositionsBuilder[row * Columns + column] = position;
                     
                     List<int> adjacentCells = new List<int>();

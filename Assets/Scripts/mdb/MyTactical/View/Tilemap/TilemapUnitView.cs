@@ -113,7 +113,7 @@ namespace mdb.MyTactial.View.TilemapView
 
                 if (Input.GetAxisRaw("Fire1") == 1)
                 {
-                    if (_lastCell.Unit == null)
+                    if (_lastCell.Unit == null || _lastCell.Unit == _unit)
                     {
                         BattleStateMachine.instance.OnClick(TilemapBattleView.instance.ReachableCells[position]);
                         _controlUnit = false;
@@ -179,6 +179,7 @@ namespace mdb.MyTactial.View.TilemapView
             if (BattleController.instance.CurrentUnit == _unit)
             {
                 _controlUnit = true;
+                _lastCell = _unit.Cell;
             }
         }
     }

@@ -185,7 +185,7 @@ namespace mdb.MyTactial.EditorTools
             {
                 for (column = 0, minx = 0; column < Columns; column++, minx += widthPercentage)
                 {
-                    Cell cell = new Cell();
+                    Cell cell = new Cell("Cell(" + column + "," + row + ")");
 
                     List<int> adjacentCells = new List<int>();
 

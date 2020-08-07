@@ -11,6 +11,7 @@ namespace mdb.MyTactial.Model
 
         public Unit Unit { get { return _unit; } }
         public Cell[] AdjacentCells { get { return _adjacentCells; } set { _adjacentCells = value; } }
+        public string Name { get { return _name; } }
 
         [NonSerialized]
         public Unit _unit;
@@ -18,9 +19,14 @@ namespace mdb.MyTactial.Model
         Cell[] _adjacentCells;
 
         [SerializeField]
-        private int _terrainEffect = 0;
+        private string _name;
 
         private bool _active;
+
+        public Cell(string name)
+        {
+            _name = name;
+        }
 
         public bool UnitEnter(Unit unit)
         {

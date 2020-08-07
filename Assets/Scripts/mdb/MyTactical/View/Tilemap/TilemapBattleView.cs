@@ -129,6 +129,7 @@ namespace mdb.MyTactial.View.TilemapView
                             List<Unit> targetUnits = new List<Unit>(BattleController.instance.CurrentTargetUnits);
                             int unitIndex = targetUnits.IndexOf(_target);
                             unitIndex = (unitIndex - 1) % targetUnits.Count;
+                            unitIndex = unitIndex < 0 ? unitIndex + targetUnits.Count : unitIndex;
 
                             _target.SetState(Unit.State.Idle);
                             _target = targetUnits[unitIndex];
