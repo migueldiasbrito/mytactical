@@ -12,6 +12,7 @@ namespace mdb.MyTactial.View.TilemapView
         public static TilemapBattleView instance;
 
         public Dictionary<Cell, Vector3Int> CellPositions { get; private set; }
+        public Dictionary<Vector3Int, Cell> ReachableCells { get; private set; }
 
         public Tilemap HighlightTilemap = null;
 
@@ -37,6 +38,7 @@ namespace mdb.MyTactial.View.TilemapView
 
         private void Start()
         {
+            ReachableCells = new Dictionary<Vector3Int, Cell>();
             _fadeDeltaTime = 0;
 
             BattleStateMachine.instance.BuildMap.OnExit += OnBuildMapExit;
@@ -77,6 +79,7 @@ namespace mdb.MyTactial.View.TilemapView
         {
             foreach (Cell cell in BattleController.instance.CurrentUnitReachableCells)
             {
+                ReachableCells.Add(CellPositions[cell], cell);
                 HighlightTilemap.SetTile(CellPositions[cell], HighlightTile);
             }
         }
@@ -87,6 +90,8 @@ namespace mdb.MyTactial.View.TilemapView
             {
                 HighlightTilemap.SetTile(CellPositions[cell], null);
             }
+
+            ReachableCells.Clear();
         }
     }
 }
