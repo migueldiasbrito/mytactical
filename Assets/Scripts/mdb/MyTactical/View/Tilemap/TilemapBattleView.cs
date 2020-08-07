@@ -308,7 +308,7 @@ namespace mdb.MyTactial.View.TilemapView
 
         private void OnEndBattleClick(object obj)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(0);
         }
 
         private void Attack()

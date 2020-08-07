@@ -121,7 +121,7 @@ namespace mdb.MyTactial.View.UIView
 
         private void OnEndBattleClick(object obj)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(0);
         }
 
         private void Attack()
