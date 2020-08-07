@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 using mdb.MyTactial.Controller;
 using mdb.MyTactial.Controller.BasicAI;
@@ -10,6 +11,7 @@ using mdb.MyTactial.Controller.BasicAI.Conditions;
 using mdb.MyTactial.Model;
 using mdb.MyTactial.View.TilemapView;
 using mdb.MyTactial.Controller.BasicAI.Actions;
+using mdb.Tools;
 
 namespace mdb.MyTactial.EditorTools
 {
@@ -152,6 +154,14 @@ namespace mdb.MyTactial.EditorTools
                 }
             }
 
+            Canvas canvas = FindObjectOfType<Canvas>();
+
+            if (canvas == null)
+            {
+                Debug.LogError("Would you be so kind to create a canvas for me first?");
+                return;
+            }
+
             GameObject gridGameObject = new GameObject("Grid", typeof(Grid), typeof(BattleController), typeof(TilemapBattleView));
             gridGameObject.GetComponent<Grid>().cellSize = new Vector3(1f, 1f);
             BattleController battleController = gridGameObject.GetComponent<BattleController>();
@@ -269,6 +279,37 @@ namespace mdb.MyTactial.EditorTools
 
             Battle battle = new Battle(cells, celAdjacentBuilders, teams, initialPositions.ToArray());
             battleController.Battle = battle;
+            
+            RectTransform actionsMenu = RectTransformTools.CreateStretched("MenuActions", (RectTransform)canvas.transform, Vector2.zero, new Vector2(1, 0.1f));
+            tilemapBattleView.ActionsMenu = actionsMenu.gameObject;
+
+            tilemapBattleView.AttackButton = CreateButtonHelper("ATTACK", actionsMenu, new Vector2(0.15f, 0.1f), new Vector2(0.45f, 0.9f));
+            tilemapBattleView.NoActionButton = CreateButtonHelper("NO ACTION", actionsMenu, new Vector2(0.55f, 0.1f), new Vector2(0.85f, 0.9f));
+
+            actionsMenu.gameObject.SetActive(false);
+
+            tilemapBattleView.MessageButton = CreateButtonHelper("MessageBox", (RectTransform)canvas.transform, new Vector2(0.1f, 0.01f), new Vector2(0.9f, 0.14f));
+            tilemapBattleView.MessageButton.gameObject.SetActive(false);
+            tilemapBattleView.MessageText = tilemapBattleView.MessageButton.GetComponentInChildren<Text>();
+            tilemapBattleView.MessageText.gameObject.SetActive(false);
+        }
+
+        private Button CreateButtonHelper(string text, RectTransform parent, Vector2 minAnchor, Vector2 maxAnchor)
+        {
+            RectTransform gameObject = RectTransformTools.CreateStretched(text, parent, minAnchor, maxAnchor);
+            Button button = gameObject.gameObject.AddComponent<Button>();
+
+            Image image = gameObject.gameObject.AddComponent<Image>();
+            image.color = new Color(0.75f, 0.75f, 0.75f, 0.85f);
+            button.image = image;
+
+            RectTransform textGameObject = RectTransformTools.CreateStretched("Text", gameObject, Vector2.zero, Vector2.one);
+            Text buttonText = textGameObject.gameObject.AddComponent<Text>();
+            buttonText.text = text;
+            buttonText.color = Color.black;
+            buttonText.alignment = TextAnchor.MiddleCenter;
+
+            return button;
         }
     }
 }
