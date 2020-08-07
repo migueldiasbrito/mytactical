@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 using mdb.MyTactial.Model;
 
@@ -6,6 +7,9 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
 {
     public class HasReachableTarget : Condition
     {
+        [SerializeField]
+        private int _maxPathLength = 1;
+
         private void Start()
         {
             BattleStateMachine.instance.StartUnitTurn.OnExit += OnStartUnitTurnExit;
@@ -38,7 +42,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
                             }
                         }
 
-                        if (visitedCells.Add(adjacentCell))
+                        if (currentCell.Path.Length <= _maxPathLength + 1 && visitedCells.Add(adjacentCell))
                         {
                             if (currentReachableCells.Contains(adjacentCell))
                             {

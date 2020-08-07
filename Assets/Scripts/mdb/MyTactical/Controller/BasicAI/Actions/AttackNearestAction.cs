@@ -9,6 +9,9 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
 {
     public class AttackNearestAction : Action
     {
+        [SerializeField]
+        private int _maxPathLength = 1;
+
         public UnitView unitView;
 
         private Unit _target = null;
@@ -60,7 +63,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                         }
                     }
 
-                    if (visitedCells.Add(adjacentCell))
+                    if (currentCell.Path.Length <= _maxPathLength + 1 && visitedCells.Add(adjacentCell))
                     {
                         if (currentReachableCells.Contains(adjacentCell))
                         {
