@@ -35,12 +35,19 @@ namespace mdb.MyTactial.View.TilemapView
         private float _fadeTime = 1f;
 
         [SerializeField]
-        private Color HighlightInitialColor = new Color(1f, 1f, 1f, 0.9f);
+        private Color _highlightInitialColor = new Color(1f, 1f, 1f, 0.9f);
 
         [SerializeField]
         private Color _highlightFinalColor = new Color(1f, 1f, 1f, 0.1f);
 
+        [SerializeField]
+        private float _inputCooldown = 0.5f;
+
         private float _fadeDeltaTime;
+        private float _cooldownDeltaTime = 0;
+
+        private Unit _target = null;
+        private bool _selectingTarget = false;
 
         private void Awake()
         {
@@ -58,6 +65,7 @@ namespace mdb.MyTactial.View.TilemapView
 
             BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
             BattleStateMachine.instance.SelectAction.OnExit += OnSelectActionExit;
+            BattleStateMachine.instance.SelectTarget.OnEnter += OnSelectTarget;
             BattleStateMachine.instance.Attack.OnEnter += OnAttack;
             BattleStateMachine.instance.UnitDefeated.OnEnter += OnUnitDefeated;
             BattleStateMachine.instance.EndBattle.OnEnter += OnEndBattle;
@@ -73,14 +81,63 @@ namespace mdb.MyTactial.View.TilemapView
         private void Update()
         {
             _fadeDeltaTime += Time.deltaTime;
-            HighlightTilemap.color = Color.Lerp(HighlightInitialColor, _highlightFinalColor, _fadeDeltaTime / _fadeTime);
+            HighlightTilemap.color = Color.Lerp(_highlightInitialColor, _highlightFinalColor, _fadeDeltaTime / _fadeTime);
 
             if (_fadeDeltaTime >= _fadeTime)
             {
-                Color temp = HighlightInitialColor;
-                HighlightInitialColor = _highlightFinalColor;
+                Color temp = _highlightInitialColor;
+                _highlightInitialColor = _highlightFinalColor;
                 _highlightFinalColor = temp;
                 _fadeDeltaTime = 0;
+            }
+
+            if (_selectingTarget)
+            {
+                _cooldownDeltaTime -= Time.deltaTime;
+
+                if (_cooldownDeltaTime <= 0)
+                {
+                    if (Input.GetAxisRaw("Fire1") == 1)
+                    {
+                        BattleStateMachine.instance.OnClick(_target);
+                        _target.SetState(Unit.State.Idle);
+                        _target = null;
+                        _selectingTarget = false;
+                        _cooldownDeltaTime = 0;
+                        return;
+                    }
+
+                    if (BattleController.instance.CurrentTargetUnits.Length > 0)
+                    {
+                        float verticalInput = Input.GetAxisRaw("Vertical");
+                        float horizontalInput = Input.GetAxisRaw("Horizontal");
+
+                        if (verticalInput == 1 || horizontalInput == 1)
+                        {
+                            List<Unit> targetUnits = new List<Unit>(BattleController.instance.CurrentTargetUnits);
+                            int unitIndex = targetUnits.IndexOf(_target);
+                            unitIndex = (unitIndex + 1) % targetUnits.Count;
+
+                            _target.SetState(Unit.State.Idle);
+                            _target = targetUnits[unitIndex];
+                            _target.SetState(Unit.State.Target);
+
+                            _cooldownDeltaTime = _inputCooldown;
+                        }
+                        else if (verticalInput == -1 || horizontalInput == -1)
+                        {
+                            List<Unit> targetUnits = new List<Unit>(BattleController.instance.CurrentTargetUnits);
+                            int unitIndex = targetUnits.IndexOf(_target);
+                            unitIndex = (unitIndex - 1) % targetUnits.Count;
+
+                            _target.SetState(Unit.State.Idle);
+                            _target = targetUnits[unitIndex];
+                            _target.SetState(Unit.State.Target);
+
+                            _cooldownDeltaTime = _inputCooldown;
+                        }
+                    }
+                }
             }
         }
 
@@ -130,6 +187,16 @@ namespace mdb.MyTactial.View.TilemapView
         private void OnSelectActionExit()
         {
             ActionsMenu.SetActive(false);
+        }
+
+        private void OnSelectTarget()
+        {
+            if (!BattleController.instance.CurrentUnit.Team.IsAIControlled && BattleController.instance.HasTargets())
+            {
+                _selectingTarget = true;
+                _target = BattleController.instance.CurrentTargetUnits[0];
+                _target.SetState(Unit.State.Target);
+            }
         }
 
         private void OnAttack()

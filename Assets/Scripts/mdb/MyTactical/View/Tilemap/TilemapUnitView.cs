@@ -12,12 +12,25 @@ namespace mdb.MyTactial.View.TilemapView
         public int TeamIndex;
         public int UnitIndex;
 
+        [SerializeField]
+        private float _fadeTime = 1f;
+
+        [SerializeField]
+        private Color _highlightInitialColor = new Color(1f, 1f, 1f, 1f);
+
+        [SerializeField]
+        private Color _highlightFinalColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+
         private Unit _unit;
         private GridMovement _gridMovement;
         private Queue<Vector2> _path;
         private bool _moving = false;
         private Cell _lastCell;
         private bool _controlUnit = false;
+        private SpriteRenderer _spriteRenderer;
+        private Color _defaultColor = new Color(1f, 1f, 1f, 0.9f);
+        private bool _targeted = false;
+        private float _fadeDeltaTime = 0;
 
         public override void DoPath(Cell[] cells)
         {
@@ -40,9 +53,13 @@ namespace mdb.MyTactial.View.TilemapView
         private void Start()
         {
             _unit = BattleController.instance.Battle.Teams[TeamIndex].Units[UnitIndex];
+            _unit.StateChangedCallback += UnitStateChanged;
 
             _gridMovement = GetComponent<GridMovement>();
             _path = new Queue<Vector2>();
+
+            _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            _defaultColor = _spriteRenderer.color;
 
             BattleStateMachine.instance.PlaceUnits.OnExit += OnPlaceUnitExit;
         }
@@ -65,6 +82,25 @@ namespace mdb.MyTactial.View.TilemapView
                         _lastCell = null;
                     }
                 }
+            }
+
+            if(_targeted)
+            {
+                _fadeDeltaTime += Time.deltaTime;
+                _spriteRenderer.color = Color.Lerp(_highlightInitialColor, _highlightFinalColor, _fadeDeltaTime / _fadeTime);
+
+                if (_fadeDeltaTime >= _fadeTime)
+                {
+                    Color temp = _highlightInitialColor;
+                    _highlightInitialColor = _highlightFinalColor;
+                    _highlightFinalColor = temp;
+                    _fadeDeltaTime = 0;
+                }
+            }
+            else if (_spriteRenderer.color != _defaultColor)
+            {
+                _spriteRenderer.color = _defaultColor;
+                _fadeDeltaTime = 0;
             }
 
             if (_controlUnit && !_moving)
@@ -108,6 +144,25 @@ namespace mdb.MyTactial.View.TilemapView
                     }
                     return;
                 }
+            }
+        }
+
+        private void UnitStateChanged(Unit.State state)
+        {
+            switch (state)
+            {
+                case Unit.State.Idle:
+                    _targeted = false;
+                    break;
+                case Unit.State.Active:
+                    _targeted = false;
+                    break;
+                case Unit.State.Target:
+                    _targeted = true;
+                    break;
+                case Unit.State.Dead:
+                    _spriteRenderer.enabled = false;
+                    break;
             }
         }
 
