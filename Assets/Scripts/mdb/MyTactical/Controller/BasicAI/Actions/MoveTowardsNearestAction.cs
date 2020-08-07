@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using mdb.MyTactial.Model;
+using mdb.MyTactial.View;
 
 namespace mdb.MyTactial.Controller.BasicAI.Actions
 {
     public class MoveTowardsNearestAction : Action
     {
-        private struct CellPathHelper
-        {
-            public Cell Cell;
-            public Cell LastReachableCell;
-        }
+        public UnitView unitView;
 
         public override bool DoAction(object[] arguments)
         {
@@ -21,16 +18,15 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
             HashSet<Cell> noEmenyCells = new HashSet<Cell>();
             List<Cell> currentReachableCells = new List<Cell>(BattleController.instance.CurrentUnitReachableCells);
 
-            pathHelper.Enqueue(new CellPathHelper { Cell = Unit.Cell, LastReachableCell = Unit.Cell });
+            pathHelper.Enqueue(new CellPathHelper { Cell = Unit.Cell, Path = new Cell[1] { Unit.Cell } });
 
             do
             {
                 CellPathHelper currentCell = pathHelper.Dequeue();
 
-
                 if (currentReachableCells.Contains(currentCell.Cell))
                 {
-                    currentCell.LastReachableCell = currentCell.Cell;
+                    currentCell.Path = new List<Cell>(currentCell.Path) { currentCell.Cell }.ToArray();
                 }
                 
                 foreach (Cell ajdacentCell in currentCell.Cell.AdjacentCells)
@@ -39,14 +35,14 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                     {
                         if(ajdacentCell.Unit != null && ajdacentCell.Unit.Team != Unit.Team)
                         {
-                            StartCoroutine(SelectCell(currentCell.LastReachableCell));
+                            StartCoroutine(SelectCell(currentCell.Path));
                             return true;
                         }
                     }
 
                     if(visitedCell.Add(ajdacentCell))
                     {
-                        pathHelper.Enqueue(new CellPathHelper { Cell = ajdacentCell, LastReachableCell = currentCell.LastReachableCell });
+                        pathHelper.Enqueue(new CellPathHelper { Cell = ajdacentCell, Path = currentCell.Path });
                     }
                 }
 
@@ -55,11 +51,12 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
             return false;
         }
 
-        private IEnumerator SelectCell(Cell cell)
+        private IEnumerator SelectCell(Cell[] path)
         {
             yield return new WaitForSeconds(1);
 
-            BattleStateMachine.instance.OnClick(cell);
+            unitView.DoPath(path);
+
             BattleStateMachine.instance.SelectAction.OnEnter += OnSelectAction;
         }
 

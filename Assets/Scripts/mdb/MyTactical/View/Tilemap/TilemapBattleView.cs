@@ -9,6 +9,8 @@ namespace mdb.MyTactial.View.TilemapView
 {
     public class TilemapBattleView : MonoBehaviour
     {
+        public static TilemapBattleView instance;
+
         public Tilemap HighlightTilemap = null;
 
         public Tile HighlightTile = null;
@@ -27,6 +29,11 @@ namespace mdb.MyTactial.View.TilemapView
         private float _fadeDeltaTime;
 
         private Dictionary<Cell, Vector3Int> _cellPositions;
+
+        private void Awake()
+        {
+            instance = this;
+        }
 
         private void Start()
         {

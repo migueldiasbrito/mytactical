@@ -260,24 +260,30 @@ namespace mdb.MyTactial.EditorTools
                         controller.TeamIndex = teamIndex;
                         controller.UnitIndex = unitIndex;
 
+                        MoveTowardsNearestAction moveTowardsNearestAction;
+
                         switch (unitBuilder.AIBehaviour)
                         {
                             case AIUnitPrefabBehaviour.AlwaysMoveTowardsTargets:
                                 controller.Reactions = new BasicAIUnitController.Reaction[2];
+                                moveTowardsNearestAction = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>();
+                                moveTowardsNearestAction.unitView = unitView;
                                 controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
                                     Conditions = null,
-                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                    Action = moveTowardsNearestAction
                                 };
                                 break;
                             case AIUnitPrefabBehaviour.MoveAfterUnitsDefeated:
                                 controller.Reactions = new BasicAIUnitController.Reaction[3];
                                 HasUnitsBeenDefeated hasUnitsBeenDefeated = unitTransform.gameObject.AddComponent<HasUnitsBeenDefeated>();
                                 hasUnitsBeenDefeated.UnitsIndex = unitBuilder.behaviourHelper;
+                                moveTowardsNearestAction = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>();
+                                moveTowardsNearestAction.unitView = unitView;
                                 controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
                                     Conditions = new Condition[1] { hasUnitsBeenDefeated },
-                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                    Action = moveTowardsNearestAction
                                 };
                                 controller.Reactions[2] = new BasicAIUnitController.Reaction
                                 {
@@ -289,10 +295,12 @@ namespace mdb.MyTactial.EditorTools
                                 controller.Reactions = new BasicAIUnitController.Reaction[3];
                                 HasCellBeenReached hasCellBeenReached = unitTransform.gameObject.AddComponent<HasCellBeenReached>();
                                 hasCellBeenReached.CellIndex = unitBuilder.behaviourHelper;
+                                moveTowardsNearestAction = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>();
+                                moveTowardsNearestAction.unitView = unitView;
                                 controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
                                     Conditions = new Condition[1] { hasCellBeenReached },
-                                    Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
+                                    Action = moveTowardsNearestAction
                                 };
                                 controller.Reactions[2] = new BasicAIUnitController.Reaction
                                 {
@@ -313,10 +321,12 @@ namespace mdb.MyTactial.EditorTools
                                 break;
                         }
 
+                        AttackNearestAction attackNearestAction = unitTransform.gameObject.AddComponent<AttackNearestAction>();
+                        attackNearestAction.unitView = unitView;
                         controller.Reactions[0] = new BasicAIUnitController.Reaction
                         {
                             Conditions = new Condition[1] { unitTransform.gameObject.AddComponent<HasReachableTarget>() },
-                            Action = unitTransform.gameObject.AddComponent<AttackNearestAction>()
+                            Action = attackNearestAction
                         };
                     }
                 }

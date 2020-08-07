@@ -9,7 +9,7 @@ namespace mdb.MyTactial.View.UIView
 {
     [RequireComponent(typeof(Image))]
     [RequireComponent(typeof(Button))]
-    public class UIUnitView : MonoBehaviour
+    public class UIUnitView : UnitView
     {
         public int TeamIndex;
         public int UnitIndex;
@@ -86,6 +86,11 @@ namespace mdb.MyTactial.View.UIView
             {
                 BattleStateMachine.instance.OnClick(_unit);
             }
+        }
+
+        public override void DoPath(Cell[] cells)
+        {
+            BattleStateMachine.instance.OnClick(cells[cells.Length - 1]);
         }
     }
 }
