@@ -31,7 +31,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Actions
                 
                 foreach (Cell ajdacentCell in currentCell.Cell.AdjacentCells)
                 {
-                    if (noEmenyCells.Add(ajdacentCell))
+                    if ((currentCell.Cell.Unit == null || currentCell.Cell.Unit == Unit) && noEmenyCells.Add(ajdacentCell))
                     {
                         if(ajdacentCell.Unit != null && ajdacentCell.Unit.Team != Unit.Team)
                         {

@@ -28,7 +28,7 @@ namespace mdb.MyTactial.Controller.BasicAI.Conditions
 
                     foreach (Cell adjacentCell in currentCell.Cell.AdjacentCells)
                     {
-                        if (noEmenyCells.Add(adjacentCell))
+                        if ((currentCell.Cell.Unit == null || currentCell.Cell.Unit == Unit) && noEmenyCells.Add(adjacentCell))
                         {
                             if (adjacentCell.Unit != null && adjacentCell.Unit.Team != Unit.Team)
                             {
