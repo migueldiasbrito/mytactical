@@ -5,8 +5,11 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 using mdb.MyTactial.Controller;
+using mdb.MyTactial.Controller.BasicAI;
+using mdb.MyTactial.Controller.BasicAI.Conditions;
 using mdb.MyTactial.Model;
 using mdb.MyTactial.View.TilemapView;
+using mdb.MyTactial.Controller.BasicAI.Actions;
 
 namespace mdb.MyTactial.EditorTools
 {
@@ -166,7 +169,7 @@ namespace mdb.MyTactial.EditorTools
 
             Cell[] cells = new Cell[Rows * Columns];
             Battle.CellAdjacentsBuilder[] celAdjacentBuilders = new Battle.CellAdjacentsBuilder[Rows * Columns];
-            tilemapBattleView.CellPositions = new Vector3Int[Rows * Columns];
+            tilemapBattleView.CellPositionsBuilder = new Vector3Int[Rows * Columns];
             for (int row = 0; row < Rows; row++)
             {
                 for (int column = 0; column < Columns; column++)
@@ -174,7 +177,7 @@ namespace mdb.MyTactial.EditorTools
                     Vector3Int position = new Vector3Int(column, row, 0);
                     backgroundTilemap.SetTile(position, DefaultTile);
                     cells[row * Columns + column] = new Cell();
-                    tilemapBattleView.CellPositions[row * Columns + column] = position;
+                    tilemapBattleView.CellPositionsBuilder[row * Columns + column] = position;
                     
                     List<int> adjacentCells = new List<int>();
                     if (row > 0 && Rows > 1)
@@ -232,7 +235,33 @@ namespace mdb.MyTactial.EditorTools
                     }
 
                     unitGameObject.transform.position =
-                        tilemapBattleView.CellPositions[unitBuilder.x + unitBuilder.y * Columns];
+                        tilemapBattleView.CellPositionsBuilder[unitBuilder.x + unitBuilder.y * Columns];
+
+                    TilemapUnitView tilemapUnitView = unitGameObject.GetComponent<TilemapUnitView>();
+                    if (tilemapUnitView == null)
+                    {
+                        tilemapUnitView = unitGameObject.AddComponent<TilemapUnitView>();
+                    }
+                    tilemapUnitView.TeamIndex = teamIndex;
+                    tilemapUnitView.UnitIndex = unitIndex;
+
+                    if (teams[teamIndex].IsAIControlled)
+                    {
+                        BasicAIUnitController AIController = unitGameObject.GetComponent<BasicAIUnitController>();
+                        if(AIController == null)
+                        {
+                            AIController = unitGameObject.AddComponent<BasicAIUnitController>();
+                            AIController.Reactions = new BasicAIUnitController.Reaction[1]
+                            {
+                                new BasicAIUnitController.Reaction(
+                                    new Condition[0],
+                                    unitGameObject.AddComponent<DoNothingAction>()
+                                )
+                            };
+                        }
+                        AIController.TeamIndex = teamIndex;
+                        AIController.UnitIndex = unitIndex;
+                    }
                 }
 
                 teams[teamIndex].Units = units;

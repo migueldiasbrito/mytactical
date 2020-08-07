@@ -11,11 +11,13 @@ namespace mdb.MyTactial.View.TilemapView
     {
         public static TilemapBattleView instance;
 
+        public Dictionary<Cell, Vector3Int> CellPositions { get; private set; }
+
         public Tilemap HighlightTilemap = null;
 
         public Tile HighlightTile = null;
 
-        public Vector3Int[] CellPositions = new Vector3Int[0];
+        public Vector3Int[] CellPositionsBuilder = new Vector3Int[0];
 
         [SerializeField]
         private float _fadeTime = 1f;
@@ -27,8 +29,6 @@ namespace mdb.MyTactial.View.TilemapView
         private Color _highlightFinalColor = new Color(1f, 1f, 1f, 0.1f);
 
         private float _fadeDeltaTime;
-
-        private Dictionary<Cell, Vector3Int> _cellPositions;
 
         private void Awake()
         {
@@ -60,16 +60,16 @@ namespace mdb.MyTactial.View.TilemapView
 
         private void OnBuildMapExit()
         {
-            _cellPositions = new Dictionary<Cell, Vector3Int>();
+            CellPositions = new Dictionary<Cell, Vector3Int>();
             for (int cellIndex = 0; cellIndex < BattleController.instance.Battle.Cells.Length; cellIndex++)
             {
-                if(cellIndex >= CellPositions.Length)
+                if(cellIndex >= CellPositionsBuilder.Length)
                 {
                     Debug.LogError("Not enough positions configured for battle cells.");
                     break;
                 }
 
-                _cellPositions.Add(BattleController.instance.Battle.Cells[cellIndex], CellPositions[cellIndex]);
+                CellPositions.Add(BattleController.instance.Battle.Cells[cellIndex], CellPositionsBuilder[cellIndex]);
             }
         }
 
@@ -77,7 +77,7 @@ namespace mdb.MyTactial.View.TilemapView
         {
             foreach (Cell cell in BattleController.instance.CurrentUnitReachableCells)
             {
-                HighlightTilemap.SetTile(_cellPositions[cell], HighlightTile);
+                HighlightTilemap.SetTile(CellPositions[cell], HighlightTile);
             }
         }
 
@@ -85,7 +85,7 @@ namespace mdb.MyTactial.View.TilemapView
         {
             foreach (Cell cell in BattleController.instance.CurrentUnitReachableCells)
             {
-                HighlightTilemap.SetTile(_cellPositions[cell], null);
+                HighlightTilemap.SetTile(CellPositions[cell], null);
             }
         }
     }
