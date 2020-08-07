@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 using mdb.MyTactial.Controller.BasicAI.Conditions;
@@ -9,15 +10,53 @@ namespace mdb.MyTactial.Controller.BasicAI
     public class BasicAIUnitController : MonoBehaviour
     {
         [Serializable]
-        public struct Pair
+        public struct Reaction
         {
-            public Condition Condition;
+            public Condition[] Conditions;
             public Actions.Action Action;
 
-            public Pair(Condition condition, Actions.Action action)
+            public Reaction(Condition[] condition, Actions.Action action)
             {
-                Condition = condition;
+                Conditions = condition;
                 Action = action;
+            }
+
+            public bool TestConditions()
+            {
+                if (Conditions == null)
+                {
+                    return true;
+                }
+
+                foreach (Condition condition in Conditions)
+                {
+                    if(!condition.TestCondition)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            public object[] GetConditionsResults()
+            {
+                if (Conditions == null)
+                {
+                    return new object[0];
+                }
+
+                List<object> results = new List<object>();
+                
+                foreach (Condition condition in Conditions)
+                {
+                    if (condition.TestResults != null)
+                    {
+                        results.AddRange(condition.TestResults);
+                    }
+                }
+
+                return results.ToArray();
             }
         }
 
@@ -26,20 +65,23 @@ namespace mdb.MyTactial.Controller.BasicAI
 
         private Unit _unit;
 
-        public Pair[] Behaviours = new Pair[0];
+        public Reaction[] Reactions = new Reaction[0];
 
         private void Start()
         {
             _unit = BattleController.instance.Battle.Teams[TeamIndex].Units[UnitIndex];
             BattleStateMachine.instance.MoveUnit.OnEnter += OnMoveUnit;
 
-            foreach (Pair pair in Behaviours)
+            foreach (Reaction reaction in Reactions)
             {
-                if (pair.Condition != null)
+                if (reaction.Conditions != null)
                 {
-                    pair.Condition.Unit = _unit;
+                    foreach (Condition condition in reaction.Conditions)
+                    {
+                        condition.Unit = _unit;
+                    }
                 }
-                pair.Action.Unit = _unit;
+                reaction.Action.Unit = _unit;
             }
         }
 
@@ -47,18 +89,18 @@ namespace mdb.MyTactial.Controller.BasicAI
         {
             if (BattleController.instance.CurrentUnit == _unit)
             {
-                foreach (Pair pair in Behaviours)
+                foreach (Reaction reactions in Reactions)
                 {
-                    if (pair.Condition == null)
+                    if (reactions.Conditions == null)
                     {
-                        if (pair.Action.DoAction(null))
+                        if (reactions.Action.DoAction(null))
                         {
                             return;
                         }
                     }
-                    else if (pair.Condition.TestCondition)
+                    else if (reactions.TestConditions())
                     {
-                        if (pair.Action.DoAction(pair.Condition.TestResults))
+                        if (reactions.Action.DoAction(reactions.GetConditionsResults()))
                         {
                             return;
                         }

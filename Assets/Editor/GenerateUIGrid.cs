@@ -263,48 +263,48 @@ namespace mdb.MyTactial.EditorTools
                         switch (unitBuilder.AIBehaviour)
                         {
                             case AIUnitPrefabBehaviour.AlwaysMoveTowardsTargets:
-                                controller.Behaviours = new BasicAIUnitController.Pair[2];
-                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                controller.Reactions = new BasicAIUnitController.Reaction[2];
+                                controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = null,
+                                    Conditions = null,
                                     Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
                                 };
                                 break;
                             case AIUnitPrefabBehaviour.MoveAfterUnitsDefeated:
-                                controller.Behaviours = new BasicAIUnitController.Pair[3];
+                                controller.Reactions = new BasicAIUnitController.Reaction[3];
                                 HasUnitsBeenDefeated hasUnitsBeenDefeated = unitTransform.gameObject.AddComponent<HasUnitsBeenDefeated>();
                                 hasUnitsBeenDefeated.UnitsIndex = unitBuilder.behaviourHelper;
-                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = hasUnitsBeenDefeated,
+                                    Conditions = new Condition[1] { hasUnitsBeenDefeated },
                                     Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
                                 };
-                                controller.Behaviours[2] = new BasicAIUnitController.Pair
+                                controller.Reactions[2] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = null,
+                                    Conditions = null,
                                     Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
                                 };
                                 break;
                             case AIUnitPrefabBehaviour.MoveAfterCellsReached:
-                                controller.Behaviours = new BasicAIUnitController.Pair[3];
+                                controller.Reactions = new BasicAIUnitController.Reaction[3];
                                 HasCellBeenReached hasCellBeenReached = unitTransform.gameObject.AddComponent<HasCellBeenReached>();
                                 hasCellBeenReached.CellIndex = unitBuilder.behaviourHelper;
-                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = hasCellBeenReached,
+                                    Conditions = new Condition[1] { hasCellBeenReached },
                                     Action = unitTransform.gameObject.AddComponent<MoveTowardsNearestAction>()
                                 };
-                                controller.Behaviours[2] = new BasicAIUnitController.Pair
+                                controller.Reactions[2] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = null,
+                                    Conditions = null,
                                     Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
                                 };
                                 break;
                             case AIUnitPrefabBehaviour.OnlyMoveToAttack:
-                                controller.Behaviours = new BasicAIUnitController.Pair[2];
-                                controller.Behaviours[1] = new BasicAIUnitController.Pair
+                                controller.Reactions = new BasicAIUnitController.Reaction[2];
+                                controller.Reactions[1] = new BasicAIUnitController.Reaction
                                 {
-                                    Condition = null,
+                                    Conditions = null,
                                     Action = unitTransform.gameObject.AddComponent<DoNothingAction>()
                                 };
                                 break;
@@ -313,9 +313,9 @@ namespace mdb.MyTactial.EditorTools
                                 break;
                         }
 
-                        controller.Behaviours[0] = new BasicAIUnitController.Pair
+                        controller.Reactions[0] = new BasicAIUnitController.Reaction
                         {
-                            Condition = unitTransform.gameObject.AddComponent<HasReachableTarget>(),
+                            Conditions = new Condition[1] { unitTransform.gameObject.AddComponent<HasReachableTarget>() },
                             Action = unitTransform.gameObject.AddComponent<AttackNearestAction>()
                         };
                     }
