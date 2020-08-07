@@ -54,6 +54,16 @@ namespace mdb.MyTactial.Model
             _name = name;
         }
 
+        public Unit(string name, int healthPoints, int attack, int defense, int movement, int agility)
+        {
+            _name = name;
+            _healthPoints = healthPoints;
+            _attack = attack;
+            _defense = defense;
+            _movement = movement;
+            _agility = agility;
+        }
+
         public void Init()
         {
             _currentHealthPoints = _healthPoints;

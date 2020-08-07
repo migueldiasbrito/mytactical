@@ -140,18 +140,18 @@ namespace mdb.MyTactial.EditorTools
                 return;
             }
 
-            HashSet<UnitBuilder> testDuplicastes = new HashSet<UnitBuilder>();
+            HashSet<Vector2> testDuplicastes = new HashSet<Vector2>();
             foreach (Team team in Teams)
             {
                 foreach (UnitBuilder unitPos in team.Units)
                 {
-                    if (unitPos.x < 0 || unitPos.x >= Columns || unitPos.y < 0 || unitPos.y >= Columns)
+                    if (unitPos.x < 0 || unitPos.x >= Columns || unitPos.y < 0 || unitPos.y >= Rows)
                     {
                         Debug.LogError("Unit with positions outside the grid.");
                         return;
                     }
 
-                    if (!testDuplicastes.Add(unitPos))
+                    if (!testDuplicastes.Add(new Vector2(unitPos.x, unitPos.y)))
                     {
                         Debug.LogError("Cell with multiple units.");
                         return;
