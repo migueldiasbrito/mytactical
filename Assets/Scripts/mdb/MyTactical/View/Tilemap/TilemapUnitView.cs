@@ -35,6 +35,7 @@ namespace mdb.MyTactial.View.TilemapView
         private bool _targeted = false;
         private float _fadeDeltaTime = 0;
         private float _cooldownDeltaTime = 0;
+        private Animator _animator;
 
         public override void DoPath(Cell[] cells)
         {
@@ -65,6 +66,8 @@ namespace mdb.MyTactial.View.TilemapView
             _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             _defaultColor = _spriteRenderer.color;
 
+            _animator = GetComponentInChildren<Animator>();
+
             BattleStateMachine.instance.MoveUnit.OnEnter += OnMoveUnit;
         }
 
@@ -74,7 +77,17 @@ namespace mdb.MyTactial.View.TilemapView
             {
                 if (_path.Count > 0)
                 {
-                    _gridMovement.MoveTo = _path.Dequeue();
+                    Vector2 nextPosition = _path.Dequeue();
+                    _gridMovement.MoveTo = nextPosition;
+
+                    if (nextPosition.y != transform.position.y)
+                    {
+                        _animator.SetTrigger(nextPosition.y > transform.position.y ? "Back" : "Front");
+                    }
+                    else if(nextPosition.x != transform.position.x)
+                    {
+                        _animator.SetTrigger(nextPosition.x > transform.position.x ? "Right" : "Left");
+                    }
                 }
                 else
                 {
@@ -136,6 +149,7 @@ namespace mdb.MyTactial.View.TilemapView
                     {
                         DoPath(position, TilemapBattleView.instance.ReachableCells[position]);
                     }
+                    //_animator.SetTrigger(verticalInput > 0 ? "Back" : "Front");
                     return;
                 }
 
@@ -148,6 +162,7 @@ namespace mdb.MyTactial.View.TilemapView
                     {
                         DoPath(position, TilemapBattleView.instance.ReachableCells[position]);
                     }
+                    //_animator.SetTrigger(horizontalInput > 0 ? "Right" : "Left");
                     return;
                 }
             }
@@ -194,6 +209,12 @@ namespace mdb.MyTactial.View.TilemapView
                 }
 
                 TilemapBattleView.instance.ShowInfo(TeamIndex, _unit.Name, _unit.CurrentHealthPoints, _unit.TotalHealthPoints);
+
+                _animator.SetTrigger("Front");
+            }
+            else
+            {
+                _animator.SetTrigger("Idle");
             }
         }
     }
