@@ -257,18 +257,58 @@ namespace mdb.MyTactial.Controller
             cells.CopyTo(CurrentUnitReachableCells);
         }
 
+        private struct TargetsHelper
+        {
+            public Cell Cell;
+            public int Distance;
+        }
+
         private void GetUnitPossibleTargets()
         {
             List<Unit> targets = new List<Unit>();
-            for (int cellIndex = 0; cellIndex < CurrentUnit.Cell.AdjacentCells.Length; cellIndex++)
-            {
-                Cell cell = CurrentUnit.Cell.AdjacentCells[cellIndex];
 
-                if(cell.Unit != null && cell.Unit.Team != CurrentUnit.Team)
+            Queue<TargetsHelper> targetsHelpers = new Queue<TargetsHelper>();
+            targetsHelpers.Enqueue(new TargetsHelper
+            {
+                Cell = CurrentUnit.Cell,
+                Distance = 0
+            });
+            HashSet<Cell> visitedCells = new HashSet<Cell>
+            {
+                CurrentUnit.Cell
+            };
+
+            do
+            {
+                TargetsHelper currentCell = targetsHelpers.Dequeue();
+
+                if(currentCell.Distance >= CurrentUnit.MeleeAttack.MinRange)
                 {
-                    targets.Add(cell.Unit);
+                    if (currentCell.Cell.Unit != null &&
+                        ((CurrentUnit.MeleeAttack.Target == Model.Action.AttackTarget.Enemy && currentCell.Cell.Unit.Team != CurrentUnit.Team) ||
+                        CurrentUnit.MeleeAttack.Target == Model.Action.AttackTarget.Team && currentCell.Cell.Unit.Team == CurrentUnit.Team))
+                    {
+                        targets.Add(currentCell.Cell.Unit);
+                    }
                 }
-            }
+
+                if(currentCell.Distance + 1 <= CurrentUnit.MeleeAttack.MaxRange)
+                {
+                    foreach(Cell cell in currentCell.Cell.AdjacentCells)
+                    {
+                        if (visitedCells.Add(cell))
+                        {
+                            targetsHelpers.Enqueue(new TargetsHelper
+                            {
+                                Cell = cell,
+                                Distance = currentCell.Distance + 1
+                            });
+                        }
+                    }
+                }
+
+            } while (targetsHelpers.Count > 0);
+
             CurrentTargetUnits = targets.ToArray();
         }
     }

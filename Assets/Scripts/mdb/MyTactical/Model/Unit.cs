@@ -23,15 +23,20 @@ namespace mdb.MyTactial.Model
         public string Name { get { return _name; } }
         public int TotalHealthPoints { get { return _healthPoints; } }
         public int CurrentHealthPoints { get { return _currentHealthPoints; } }
+        public int TotalManaPoints { get { return _manaPoints; } }
+        public int CurrentManaPoints { get { return _currentManaPoints; } }
         public int Attack { get { return _attack; } }
         public int Defense { get { return _defense; } }
         public int Agility { get { return _agility; } }
         public int Movement { get { return _movement; } }
+        public Action MeleeAttack { get { return _meleeAttack; } }
 
         [SerializeField]
         private string _name;
         [SerializeField]
         private int _healthPoints = 1;
+        [SerializeField]
+        private int _manaPoints = 0;
         [SerializeField]
         private int _attack = 1;
         [SerializeField]
@@ -40,6 +45,8 @@ namespace mdb.MyTactial.Model
         private int _agility = 1;
         [SerializeField]
         private int _movement = 1;
+        [SerializeField]
+        private Action _meleeAttack = new Action();
 
         [NonSerialized]
         private Team _team;
@@ -47,6 +54,8 @@ namespace mdb.MyTactial.Model
         private Cell _cell;
         [NonSerialized]
         private int _currentHealthPoints;
+        [NonSerialized]
+        private int _currentManaPoints;
 
         private State _state;
 
@@ -59,6 +68,7 @@ namespace mdb.MyTactial.Model
         {
             _name = name;
             _healthPoints = healthPoints;
+            _manaPoints = 0;
             _attack = attack;
             _defense = defense;
             _movement = movement;
@@ -68,6 +78,7 @@ namespace mdb.MyTactial.Model
         public void Init()
         {
             _currentHealthPoints = _healthPoints;
+            _currentManaPoints = _manaPoints;
         }
 
         public void DecreaseHealthPointsBy(int damage)

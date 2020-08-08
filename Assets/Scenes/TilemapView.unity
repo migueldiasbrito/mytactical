@@ -754,79 +754,187 @@ MonoBehaviour:
       _units:
       - _name: Max
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 14
         _defense: 4
         _agility: 4
         _movement: 6
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Hans
         _healthPoints: 14
+        _manaPoints: 0
         _attack: 14
         _defense: 5
         _agility: 6
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 2
+          _maxRange: 2
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Tao
         _healthPoints: 10
+        _manaPoints: 0
         _attack: 8
         _defense: 4
         _agility: 6
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Lowe
         _healthPoints: 11
+        _manaPoints: 0
         _attack: 10
         _defense: 5
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
     - _name: Signfaust
       _isAIControlled: 1
       _units:
       - _name: Sign Knight
         _healthPoints: 14
+        _manaPoints: 0
         _attack: 16
         _defense: 7
         _agility: 7
         _movement: 7
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Dark Dwarf
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 12
         _defense: 8
         _agility: 5
         _movement: 4
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Dark Dwarf
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 12
         _defense: 8
         _agility: 5
         _movement: 4
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Goblin
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 9
         _defense: 6
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Goblin
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 9
         _defense: 6
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Goblin
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 9
         _defense: 6
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Goblin
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 9
         _defense: 6
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
       - _name: Goblin
         _healthPoints: 12
+        _manaPoints: 0
         _attack: 9
         _defense: 6
         _agility: 5
         _movement: 5
+        _meleeAttack:
+          _name: Melee attack
+          _minRange: 1
+          _maxRange: 1
+          _area: 1
+          _manaCost: 0
+          _type: 0
+          _target: 0
     _initialPositions: 31000000320000002300000024000000e7000000d8000000d9000000ca000000cb000000a30000009400000093000000
     _adjacentsBuilders:
     - AdjacentCells: 0e00000001000000
