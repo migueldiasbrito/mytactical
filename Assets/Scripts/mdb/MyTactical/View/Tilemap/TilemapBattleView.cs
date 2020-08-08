@@ -13,6 +13,11 @@ namespace mdb.MyTactial.View.TilemapView
     {
         public static TilemapBattleView instance;
 
+        private const int ATTACK_BUTTON = 0;
+        private const int SPELL1_BUTTON = 1;
+        private const int SPELL2_BUTTON = 2;
+        private const int STAY_BUTTON = 3;
+
         public Dictionary<Cell, Vector3Int> CellPositions { get; private set; }
         public Dictionary<Vector3Int, Cell> ReachableCells { get; private set; }
 
@@ -23,8 +28,9 @@ namespace mdb.MyTactial.View.TilemapView
         public Vector3Int[] CellPositionsBuilder = new Vector3Int[0];
 
         public GameObject ActionsMenu;
-        public Button AttackButton;
-        public Button NoActionButton;
+        public Button[] Buttons;
+        public Text Spell1Text;
+        public Text Spell2Text;
 
         public Button MessageButton;
         public Text MessageText;
@@ -52,7 +58,9 @@ namespace mdb.MyTactial.View.TilemapView
 
         private Unit _target = null;
         private bool _selectingTarget = false;
-        private Button _activeButton;
+
+        private int _activeButton;
+        private bool moreThanOneButtonActive = false;
 
         public void ShowInfo(int teamIndex, string name, int currentHealthPoints, int totalHealthPoints)
         {
@@ -96,8 +104,8 @@ namespace mdb.MyTactial.View.TilemapView
 
             BattleStateMachine.instance.EndBattle.OnClickEvent += OnEndBattleClick;
 
-            AttackButton.onClick.AddListener(Attack);
-            NoActionButton.onClick.AddListener(NoAction);
+            Buttons[ATTACK_BUTTON].onClick.AddListener(Attack);
+            Buttons[STAY_BUTTON].onClick.AddListener(NoAction);
 
             MessageButton.onClick.AddListener(NextMessage);
         }
@@ -129,29 +137,60 @@ namespace mdb.MyTactial.View.TilemapView
                 {
                     if (Input.GetAxisRaw("Fire1") == 1)
                     {
-                        _activeButton.onClick.Invoke();
+                        Buttons[_activeButton].onClick.Invoke();
                         _cooldownDeltaTime = _inputCooldown;
                         return;
                     }
 
-                    float verticalInput = Input.GetAxisRaw("Vertical");
-                    float horizontalInput = Input.GetAxisRaw("Horizontal");
+                    if (moreThanOneButtonActive)
+                    {
+                        float verticalInput = Input.GetAxisRaw("Vertical");
+                        float horizontalInput = Input.GetAxisRaw("Horizontal");
 
-                    if (_activeButton == AttackButton && (verticalInput == 1 || horizontalInput == 1))
-                    {
-                        _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
-                        _activeButton = NoActionButton;
-                        _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
-                        _cooldownDeltaTime = _inputCooldown;
-                        return;
-                    }
-                    else if (_activeButton == AttackButton && (verticalInput == -1 || horizontalInput == -1))
-                    {
-                        _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
-                        _activeButton = AttackButton;
-                        _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
-                        _cooldownDeltaTime = _inputCooldown;
-                        return;
+                        if (verticalInput == 1 || horizontalInput == 1)
+                        {
+                            int newActiveButton = _activeButton;
+
+                            for(int buttonIndex = _activeButton + 1; buttonIndex < Buttons.Length; buttonIndex++)
+                            {
+                                if (Buttons[buttonIndex].gameObject.activeSelf)
+                                {
+                                    newActiveButton = buttonIndex;
+                                    break;
+                                }
+                            }
+
+                            if (newActiveButton != _activeButton)
+                            {
+                                Buttons[_activeButton].transform.localScale = new Vector3(1f, 1f, 1f);
+                                _activeButton = newActiveButton;
+                                Buttons[_activeButton].transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                                _cooldownDeltaTime = _inputCooldown;
+                            }
+                            return;
+                        }
+                        else if (verticalInput == -1 || horizontalInput == -1)
+                        {
+                            int newActiveButton = _activeButton;
+
+                            for (int buttonIndex = _activeButton - 1; buttonIndex >= 0; buttonIndex--)
+                            {
+                                if (Buttons[buttonIndex].gameObject.activeSelf)
+                                {
+                                    newActiveButton = buttonIndex;
+                                    break;
+                                }
+                            }
+
+                            if (newActiveButton != _activeButton)
+                            {
+                                Buttons[_activeButton].transform.localScale = new Vector3(1f, 1f, 1f);
+                                _activeButton = newActiveButton;
+                                Buttons[_activeButton].transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                                _cooldownDeltaTime = _inputCooldown;
+                            }
+                            return;
+                        }
                     }
                 }
 
@@ -242,16 +281,39 @@ namespace mdb.MyTactial.View.TilemapView
             {
                 if (BattleController.instance.HasTargets())
                 {
-                    AttackButton.gameObject.SetActive(true);
-                    _activeButton = AttackButton;
+                    Buttons[ATTACK_BUTTON].gameObject.SetActive(true);
+                    _activeButton = ATTACK_BUTTON;
+                    moreThanOneButtonActive = true;
                 }
                 else
                 {
-                    AttackButton.gameObject.SetActive(false);
-                    _activeButton = NoActionButton;
+                    Buttons[ATTACK_BUTTON].gameObject.SetActive(false);
+                    _activeButton = STAY_BUTTON;
                 }
 
-                _activeButton.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
+                if (BattleController.instance.CurrentSpellTargetUnits.Length > 0 &&
+                    BattleController.instance.CurrentSpellTargetUnits[0].Length > 0)
+                {
+                    Buttons[SPELL1_BUTTON].gameObject.SetActive(true);
+                    moreThanOneButtonActive = true;
+                }
+                else
+                {
+                    Buttons[SPELL1_BUTTON].gameObject.SetActive(false);
+                }
+
+                if (BattleController.instance.CurrentSpellTargetUnits.Length > 1 &&
+                    BattleController.instance.CurrentSpellTargetUnits[1].Length > 0)
+                {
+                    Buttons[SPELL2_BUTTON].gameObject.SetActive(true);
+                    moreThanOneButtonActive = true;
+                }
+                else
+                {
+                    Buttons[SPELL2_BUTTON].gameObject.SetActive(false);
+                }
+
+                Buttons[_activeButton].transform.localScale = new Vector3(1.5f, 1.5f, 1f);
                 ActionsMenu.SetActive(true);
                 _cooldownDeltaTime = _inputCooldown;
             }
@@ -261,8 +323,9 @@ namespace mdb.MyTactial.View.TilemapView
         {
             if (!BattleController.instance.CurrentUnit.Team.IsAIControlled)
             {
-                _activeButton.transform.localScale = new Vector3(1f, 1f, 1f);
+                Buttons[_activeButton].transform.localScale = new Vector3(1f, 1f, 1f);
                 ActionsMenu.SetActive(false);
+                moreThanOneButtonActive = false;
             }
         }
 

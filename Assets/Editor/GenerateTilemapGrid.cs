@@ -283,8 +283,13 @@ namespace mdb.MyTactial.EditorTools
             RectTransform actionsMenu = RectTransformTools.CreateStretched("MenuActions", (RectTransform)canvas.transform, Vector2.zero, new Vector2(1, 0.1f));
             tilemapBattleView.ActionsMenu = actionsMenu.gameObject;
 
-            tilemapBattleView.AttackButton = CreateButtonHelper("ATTACK", actionsMenu, new Vector2(0.15f, 0.1f), new Vector2(0.45f, 0.9f));
-            tilemapBattleView.NoActionButton = CreateButtonHelper("NO ACTION", actionsMenu, new Vector2(0.55f, 0.1f), new Vector2(0.85f, 0.9f));
+            tilemapBattleView.Buttons = new Button[4]
+            {
+                CreateButtonHelper("ATTACK", actionsMenu, new Vector2(0.125f, 0.1f), new Vector2(0.275f, 0.9f)),
+                CreateButtonHelper("SPELL1", actionsMenu, new Vector2(0.325f, 0.1f), new Vector2(0.475f, 0.9f)),
+                CreateButtonHelper("SPELL2", actionsMenu, new Vector2(0.525f, 0.1f), new Vector2(0.675f, 0.9f)),
+                CreateButtonHelper("NO ACTION", actionsMenu, new Vector2(0.725f, 0.1f), new Vector2(0.875f, 0.9f))
+            };
 
             actionsMenu.gameObject.SetActive(false);
 

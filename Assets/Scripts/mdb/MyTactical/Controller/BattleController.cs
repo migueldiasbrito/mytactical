@@ -17,6 +17,7 @@ namespace mdb.MyTactial.Controller
 		public Unit CurrentTarget { get; private set; }
 		public Cell[] CurrentUnitReachableCells { get; private set; }
         public Unit[] CurrentTargetUnits { get; private set; }
+        public Unit[][] CurrentSpellTargetUnits { get; private set; }
 
         public int CurrentDamage { get; private set; }
 
@@ -266,6 +267,14 @@ namespace mdb.MyTactial.Controller
         private void GetUnitPossibleTargets()
         {
             List<Unit> targets = new List<Unit>();
+            int maxDistance = CurrentUnit.MeleeAttack.MinRange;
+
+            List<List<Unit>> specialTargets = new List<List<Unit>>();
+            foreach (Model.Action action in CurrentUnit.Spells)
+            {
+                maxDistance = Math.Max(maxDistance, action.MaxRange);
+                specialTargets.Add(new List<Unit>());
+            }
 
             Queue<TargetsHelper> targetsHelpers = new Queue<TargetsHelper>();
             targetsHelpers.Enqueue(new TargetsHelper
@@ -273,16 +282,14 @@ namespace mdb.MyTactial.Controller
                 Cell = CurrentUnit.Cell,
                 Distance = 0
             });
-            HashSet<Cell> visitedCells = new HashSet<Cell>
-            {
-                CurrentUnit.Cell
-            };
+            HashSet<Cell> visitedCells = new HashSet<Cell> { CurrentUnit.Cell };
 
             do
             {
                 TargetsHelper currentCell = targetsHelpers.Dequeue();
 
-                if(currentCell.Distance >= CurrentUnit.MeleeAttack.MinRange)
+                if(currentCell.Distance >= CurrentUnit.MeleeAttack.MinRange &&
+                    currentCell.Distance <= CurrentUnit.MeleeAttack.MaxRange)
                 {
                     if (currentCell.Cell.Unit != null &&
                         ((CurrentUnit.MeleeAttack.Target == Model.Action.AttackTarget.Enemy && currentCell.Cell.Unit.Team != CurrentUnit.Team) ||
@@ -292,7 +299,21 @@ namespace mdb.MyTactial.Controller
                     }
                 }
 
-                if(currentCell.Distance + 1 <= CurrentUnit.MeleeAttack.MaxRange)
+                for (int spellIndex = 0; spellIndex < CurrentUnit.Spells.Length; spellIndex++)
+                {
+                    Model.Action spell = CurrentUnit.Spells[spellIndex];
+                    if (currentCell.Distance >= spell.MinRange && currentCell.Distance <= spell.MaxRange)
+                    {
+                        if (currentCell.Cell.Unit != null &&
+                            ((spell.Target == Model.Action.AttackTarget.Enemy && currentCell.Cell.Unit.Team != CurrentUnit.Team) ||
+                            spell.Target == Model.Action.AttackTarget.Team && currentCell.Cell.Unit.Team == CurrentUnit.Team))
+                        {
+                            specialTargets[spellIndex].Add(currentCell.Cell.Unit);
+                        }
+                    }
+                }
+
+                if(currentCell.Distance + 1 <= maxDistance)
                 {
                     foreach(Cell cell in currentCell.Cell.AdjacentCells)
                     {
@@ -310,6 +331,12 @@ namespace mdb.MyTactial.Controller
             } while (targetsHelpers.Count > 0);
 
             CurrentTargetUnits = targets.ToArray();
+
+            CurrentSpellTargetUnits = new Unit[specialTargets.Count][];
+            for (int spellIndex = 0; spellIndex < specialTargets.Count; spellIndex++)
+            {
+                CurrentSpellTargetUnits[spellIndex] = specialTargets[spellIndex].ToArray();
+            }
         }
     }
 }

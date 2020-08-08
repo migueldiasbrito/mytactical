@@ -10,6 +10,7 @@ namespace mdb.MyTactial.Model
         public enum AttackTarget { Enemy, Team }
 
         public string Name { get { return _name; } }
+        public int HealthPoints { get { return _healthPoints; } }
         public int MinRange { get { return _minRange; } }
         public int MaxRange { get { return _maxRange; } }
         public int Area { get { return _area; } }
@@ -19,6 +20,9 @@ namespace mdb.MyTactial.Model
 
         [SerializeField]
         private string _name;
+
+        [SerializeField]
+        private int _healthPoints;
 
         [SerializeField]
         private int _minRange;
@@ -41,6 +45,7 @@ namespace mdb.MyTactial.Model
         public Action()
         {
             _name = "Melee attack";
+            _healthPoints = 0;
             _minRange = 1;
             _maxRange = 1;
             _area = 1;

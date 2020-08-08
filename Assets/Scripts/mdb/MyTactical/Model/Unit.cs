@@ -30,6 +30,7 @@ namespace mdb.MyTactial.Model
         public int Agility { get { return _agility; } }
         public int Movement { get { return _movement; } }
         public Action MeleeAttack { get { return _meleeAttack; } }
+        public Action[] Spells { get { return _spells; } }
 
         [SerializeField]
         private string _name;
@@ -47,6 +48,8 @@ namespace mdb.MyTactial.Model
         private int _movement = 1;
         [SerializeField]
         private Action _meleeAttack = new Action();
+        [SerializeField]
+        private Action[] _spells = new Action[0];
 
         [NonSerialized]
         private Team _team;
